@@ -65,7 +65,7 @@ DATABASES = {
         'ENGINE': 'mysql.connector.django',  # Using MySQL Connector
         'NAME': os.getenv('MYSQL_DATABASE', 'railway'),  # Default DB name
         'USER': os.getenv('MYSQL_USER', 'root'),  
-        'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),  
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', 'pVIaNlrIRGOiYeUUhGsltezCsVxAtxYw'),  
         'HOST': os.getenv('MYSQL_HOST', 'mysql.railway.internal'),  
         'PORT': os.getenv('MYSQL_PORT', '3306'),  
         'OPTIONS': {
