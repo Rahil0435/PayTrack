@@ -8,6 +8,8 @@ from pathlib import Path
 import pymysql
 pymysql.install_as_MySQLdb()
 
+from urllib.parse import urlparse
+
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -63,19 +65,35 @@ TEMPLATES = [
 WSGI_APPLICATION = 'BillingSoftware.wsgi.application'
 
 # Database Configuration for Railway MySQL
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MYSQL_DATABASE', 'railway'),
-        'USER': os.getenv('MYSQL_USER', 'root'),
-        'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),
-        'HOST': os.getenv('MYSQL_HOST', 'mysql.railway.internal'),
-        'PORT': os.getenv('MYSQL_PORT', '3306'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-        },
+pymysql.install_as_MySQLdb()
+
+# Get database URL (Use PRIVATE inside Railway, otherwise use PUBLIC)
+DATABASE_URL = os.getenv('DATABASE_URL', '')
+
+if DATABASE_URL:
+    db_info = urlparse(DATABASE_URL)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': db_info.path[1:],  # Extract database name
+            'USER': db_info.username,
+            'PASSWORD': db_info.password,
+            'HOST': db_info.hostname,
+            'PORT': db_info.port or '3306',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.getenv('DATABASE_NAME', 'railway'),
+            'USER': os.getenv('DATABASE_USER', 'railway'),
+            'PASSWORD': os.getenv('DATABASE_PASSWORD', ''),
+            'HOST': os.getenv('DATABASE_HOST', ''),  
+            'PORT': os.getenv('DATABASE_PORT', '3306'),
+        }
+    }
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
