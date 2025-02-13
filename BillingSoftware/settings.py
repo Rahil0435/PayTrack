@@ -5,6 +5,9 @@ Django settings for BillingSoftware project.
 import os
 import dj_database_url
 from pathlib import Path
+import pymysql
+pymysql.install_as_MySQLdb()
+
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
