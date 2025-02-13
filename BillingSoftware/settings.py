@@ -62,12 +62,16 @@ WSGI_APPLICATION = 'BillingSoftware.wsgi.application'
 # Database Configuration for Railway MySQL
 DATABASES = {
     'default': {
-        'ENGINE': 'mysql.connector.django',
-        'NAME': os.getenv('MYSQL_DATABASE', 'paytrack'),
-        'USER': os.getenv('MYSQL_USER', 'root'),
-        'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),
-        'HOST': os.getenv('MYSQL_HOST', '127.0.0.1'),
-        'PORT': os.getenv('MYSQL_PORT', '3307'),
+        'ENGINE': 'mysql.connector.django',  # Using MySQL Connector
+        'NAME': os.getenv('MYSQL_DATABASE', 'railway'),  # Default DB name
+        'USER': os.getenv('MYSQL_USER', 'root'),  
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),  
+        'HOST': os.getenv('MYSQL_HOST', 'mysql.railway.internal'),  
+        'PORT': os.getenv('MYSQL_PORT', '3307'),  
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'use_unicode': True,
+        },
     }
 }
 
