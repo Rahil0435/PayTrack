@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Details</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 0;
+            border-bottom: 2px solid #0056b3;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .header p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        /* Content Section */
+        .content {
+            margin: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Buttons */
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button,
+        .download-button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover,
+        .download-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Footer Section */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .header p {
+                font-size: 12px;
+            }
+
+            .content {
+                margin: 10px;
+            }
+
+            th,
+            td {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            button,
+            .download-button {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .header p {
+                font-size: 10px;
+            }
+
+            th,
+            td {
+                font-size: 12px;
+                padding: 6px;
+            }
+
+            button,
+            .download-button {
+                padding: 6px 10px;
+                font-size: 10px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                margin: 0;
+            }
+
+            .buttons {
+                display: none;
+            }
+
+            .footer {
+                page-break-before: auto;
+            }
+        }
+    </style>
+
+    <script>
+        /* Print Invoice */
+        function printInvoice() {
+            const printContent = document.querySelector('.invoice-container'); // Select invoice content
+            const originalContent = document.body.innerHTML; // Save the original content
+
+            document.body.innerHTML = printContent.innerHTML; // Replace body with the invoice content
+            window.print(); // Trigger print
+            document.body.innerHTML = originalContent; 
+        }
+
+        /* Download Invoice as PDF */
+        function downloadInvoice() {
+            const element = document.querySelector('.invoice-container'); // Target the content container
+            const options = {
+                margin: 0.5,
+                filename: 'invoice.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(options).from(element).save();
+        }
+    </script>
+</head>
+
+<body>
+
+    <!-- Printable Area -->
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>LICKEES</h1>
+            <p style="font-size: 17px;"><b>Lick It Like It</b></p>
+            <p>GST Number: 29AAGCE2994J1Z2</p>
+            <p>19,Kateramma Temple Rd,
+                Aduru,Bengaluru,Kithiganur,
+                Karnataka
+            </p>
+            <p>Invoice No: {{ invoice.invoice_number }}</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <p><strong>Date:</strong> {{ invoice.date }}</p>
+            <p><strong>Customer:</strong> {{ invoice.customer }}</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>₹{{ item.price }}</td>
+                        <td>₹{{ item.subtotal }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p style="text-align: right;"><strong>Discount ({{ invoice.discount_percentage }}%)</strong></p>
+            <p style="text-align: right;"><strong>Total: ₹{{ invoice.total_amount }}</strong></p>
+        </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="buttons">
+        <button onclick="printInvoice()">Print Invoice</button>
+        <button onclick="downloadInvoice()">Download as PDF</button>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>Thank you for your business!</p>
+        <p>If you have any questions about this invoice, please contact us at contact@lickees.com</p>
+    </div>
+</body>
+
+</html>
