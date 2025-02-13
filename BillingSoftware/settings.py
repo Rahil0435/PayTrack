@@ -62,7 +62,7 @@ WSGI_APPLICATION = 'BillingSoftware.wsgi.application'
 # Database Configuration for Railway MySQL
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Using MySQL Connector
+        'ENGINE': 'mysql.connector.django',  # Using MySQL Connector
         'NAME': os.getenv('MYSQL_DATABASE', 'railway'),  # Default DB name
         'USER': os.getenv('MYSQL_USER', 'root'),  
         'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),  
