@@ -19,9 +19,16 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 import app.views
+from django.http import HttpResponseNotFound
+
+def favicon_view(request):
+    return HttpResponseNotFound()
+
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("favicon.ico", favicon_view),
     path('', app.views.Home, name='home'),
     path('form/', app.views.registration, name='form'),
     path('login/', app.views.Login, name='login'),
