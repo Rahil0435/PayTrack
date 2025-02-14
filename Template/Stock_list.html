@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock List</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e8eff6;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #0056b3;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .navbar {
+            background-color: #0056b3;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-links li {
+            position: relative;
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 16px;
+            transition: color 0.3s ease;
+            padding: 5px 10px;
+        }
+
+        .nav-links a:hover {
+            color: #cce4ff;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1000;
+            min-width: 150px;
+        }
+
+        .dropdown-content a {
+            display: block;
+            padding: 10px 15px;
+            color: #0056b3;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f4f6f9;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .table-container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #0056b3;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9fafd;
+        }
+
+        tr:hover {
+            background-color: #cfe2f3;
+        }
+
+        td {
+            color: #555;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .btn-container button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #0056b3;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-container button:hover {
+            background-color: #003d80;
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-wrap: wrap;
+                text-align: center;
+            }
+
+            .nav-links {
+                justify-content: center;
+                margin-top: 10px;
+            }
+
+            .nav-links li {
+                margin: 5px 10px;
+            }
+
+            h1 {
+                font-size: 22px;
+                margin: 15px 0;
+            }
+
+            .table-container {
+                padding: 15px;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            .btn-container {
+                justify-content: center;
+            }
+
+            .btn-container button {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            th, td {
+                padding: 8px 10px;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>PayTrack</h1>
+        <ul class="nav-links">
+            <li style="font-size: 24px;"><b>PayTrack</b></li>
+            <li><a href="{% url 'userhome' %}">Home</a></li>
+            <li class="dropdown">
+                <a href="javascript:void(0)">Manage</a>
+                <div class="dropdown-content">
+                    <a href="{% url 'addproduction' %}">Add Production</a>
+                    <a href="{% url 'invoicelist' %}">Invoice List</a>
+                    <a href="{% url 'productionhistory' %}">Production History</a>
+                    <a href="{% url 'productlist' %}">Stock List</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <h1>Product List</h1>
+    <div class="table-container">
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Current Stock</th>
+            </tr>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.price }}</td>
+                <td>{{ product.quantity }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <div class="btn-container">
+            <button><a href="{% url 'addproduction' %}">Add Quantity</a></button>
+        </div>
+    </div>
+</body>
+</html>

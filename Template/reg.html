@@ -1,0 +1,185 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url("{% static 'image/5.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            background: rgba(104, 98, 98, 0.9);
+            opacity: 98%;
+            padding: 40px 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .form-container h2 {
+            margin: 0 0 20px 0;
+            text-align: center;
+            color: #fafbfc;
+            font-size: 28px;
+        }
+
+        .form-container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .form-container th {
+            text-align: left;
+            padding: 10px 0;
+            font-size: 16px;
+            color: #030000;
+        }
+
+        .form-container th h1 {
+            font-size: 18px;
+            margin: 0;
+            color: #221d1d;
+        }
+
+        .form-container th input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-container th input:focus {
+            border-color: #036ad8;
+            outline: none;
+            box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
+        }
+
+        .form-container button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background-color: #032e5c;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-container button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 30px 20px;
+                width: 100%;
+            }
+
+            .form-container h2 {
+                font-size: 24px;
+            }
+
+            .form-container th {
+                padding: 8px 0;
+                font-size: 14px;
+            }
+
+            .form-container th h1 {
+                font-size: 16px;
+            }
+
+            .form-container th input {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            .form-container button {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-container {
+                padding: 20px 15px;
+            }
+
+            .form-container h2 {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            .form-container th {
+                font-size: 12px;
+            }
+
+            .form-container th h1 {
+                font-size: 14px;
+            }
+
+            .form-container th input {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            .form-container button {
+                padding: 8px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Registration Form</h2>
+        <form method="post" action="{% url 'form' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <table>
+                <tr>
+                    <th><h1>Name</h1></th>
+                    <th><input type="text" name="Name" required></th>
+                </tr>
+                <tr>
+                    <th><h1>Phone No</h1></th>
+                    <th><input type="tel" name="phno" required></th>
+                </tr>
+                <tr>
+                    <th><h1>Username</h1></th>
+                    <th><input type="text" name="uname" required></th>
+                </tr>
+                <tr>
+                    <th><h1>Password</h1></th>
+                    <th><input type="password" name="psw" required></th>
+                </tr>
+                <tr>
+                    <th colspan="2">
+                        <button type="submit">Register</button>
+                    </th>
+                </tr>
+            </table>
+        </form>
+    </div>
+</body>
+</html>

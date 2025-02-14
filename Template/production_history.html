@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #0056b3;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            overflow-x: auto;
+            display: block;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        th {
+            background-color: #f8f8f8;
+            color: #555;
+            font-weight: bold;
+        }
+
+        td {
+            background-color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .no-records {
+            text-align: center;
+            font-size: 16px;
+            color: #999;
+            padding: 20px;
+        }
+
+        button {
+            background-color: #0056b3;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 20px;
+            display: inline-block;
+        }
+
+        button:hover {
+            background-color: #003d80;
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            th, td {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            button {
+                padding: 8px 15px;
+                font-size: 14px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            th, td {
+                font-size: 12px;
+                padding: 6px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            button {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button><a href="{% url 'userhome' %}"><-- Home</a></button>
+    <div class="container">
+        <h1>Production History</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Product</th>
+                    <th>Quantity Produced</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if history %}
+                    {% for record in history %}
+                    <tr>
+                        <td>{{ record.date }}</td>
+                        <td>{{ record.product.name }}</td>
+                        <td>{{ record.quantity_produced }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="no-records">No production history available.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

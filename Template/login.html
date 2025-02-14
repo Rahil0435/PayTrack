@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url("{% static 'image/5.jpg' %}");
+            background-size: cover;
+            background-position: right;
+            background-repeat: no-repeat;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            background-color: rgba(104, 98, 98, 0.9);
+            padding: 40px 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        .login-container h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #f2f5f8;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #cbd3dc;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: #f9fafd;
+            box-sizing: border-box;
+        }
+
+        .login-container input:focus {
+            border-color: #0056b3;
+            outline: none;
+            box-shadow: 0 0 4px rgba(0, 86, 179, 0.3);
+        }
+
+        .login-container button {
+            width: 100%;
+            padding: 12px;
+            background-color: #0056b3;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .login-container button:hover {
+            background-color: #003d80;
+        }
+
+        .login-container button:active {
+            background-color: #002d60;
+        }
+
+        .signup-button {
+            background-color: #6c757d;
+            margin-top: 0;
+        }
+
+        .signup-button:hover {
+            background-color: #565e64;
+        }
+
+        .signup-button:active {
+            background-color: #3c3f42;
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                background-position: center;
+                padding: 10px;
+            }
+
+            .login-container {
+                padding: 30px 20px;
+                width: 100%;
+            }
+
+            .login-container h1 {
+                font-size: 24px;
+            }
+
+            .login-container input, .login-container button {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 20px 15px;
+            }
+
+            .login-container h1 {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+
+            .login-container input {
+                padding: 10px;
+                font-size: 12px;
+            }
+
+            .login-container button {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1 class="l">Login</h1>
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="text" placeholder="Username" name="uname" required>
+            <input type="password" placeholder="Password" name="pswd" required>
+            <button type="submit">Login</button>
+            <button type="button" class="signup-button">
+                <a href="{% url 'form' %}">Register</a>
+            </button>
+        </form>
+    </div>
+</body>
+</html>

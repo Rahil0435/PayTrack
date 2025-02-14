@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #0056b3;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        th {
+            background-color: #f8f8f8;
+            color: #555;
+            font-weight: bold;
+        }
+
+        td {
+            background-color: #fff;
+        }
+
+        td a {
+            color: #0056b3;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        td a:hover {
+            color: #003d80;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .pagination a {
+            padding: 8px 16px;
+            text-decoration: none;
+            color: #0056b3;
+            border: 1px solid #0056b3;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination a:hover {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+
+        .pagination a.active {
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            font-weight: bold;
+        }
+
+        .pagination span {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .no-invoices {
+            text-align: center;
+            padding: 20px;
+            font-size: 16px;
+            color: #999;
+        }
+
+        button {
+            background-color: #0056b3;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button a {
+            text-decoration: none;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            table th, table td {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .pagination a {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+
+            .pagination a {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button><a href="{% url 'userhome' %}"><-- Home</a></button>
+    <div class="container">
+        <h1>Invoice List</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Invoice Number</th>
+                    <th>Date</th>
+                    <th>Total Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in page_obj %}
+                <tr>
+                    <td>{{ invoice.invoice_number }}</td>
+                    <td>{{ invoice.date }}</td>
+                    <td>₹{{ invoice.total_amount }}</td>
+                    <td>
+                        <a href="{% url 'invoice_detail' invoice.id %}">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="no-invoices">No invoices found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            {% endif %}
+            <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Next</a>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
