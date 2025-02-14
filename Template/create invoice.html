@@ -168,6 +168,7 @@
             <input type="text" name="customer" required>
             <label>Date</label>
             <input type="date" name="date" required>
+            <input type="hidden" name="invoice_number" value="{{ form.invoice_number.value }}">
             <label>Discount (%)</label>
             <input type="number" name="discount_percentage" value="0" min="0" max="100" oninput="updateTotal()">
             <button type="button" class="add-row-btn" onclick="addRow()">Add Product</button>
