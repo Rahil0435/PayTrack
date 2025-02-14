@@ -132,55 +132,6 @@
         .invoice-footer .total span {
             color: #555;
         }
-        .alert {
-    padding: 12px 15px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    font-size: 14px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-error, .alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.alert-warning {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
-}
-
-.alert-info {
-    background-color: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-}
-
-.alert button {
-    background: none;
-    border: none;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    color: inherit;
-}
-
-.alert button:hover {
-    opacity: 0.7;
-}
-
-
     </style>
     <script>
         function addRow() {
@@ -247,14 +198,7 @@
         window.onload = function() {
             const currentDate = new Date().toISOString().split('T')[0];
             document.querySelector('input[name="date"]').value = currentDate;
-
-            const year = currentDate.slice(2, 4);
-            const month = currentDate.slice(5, 7);
-            const day = currentDate.slice(8, 10);
-            const invoiceNumber = `INV-${day}${month}${year}-001`;
-            document.querySelector('input[name="invoice_number"]').value = invoiceNumber;
         };
-
     </script>
 </head>
 <body>
@@ -271,12 +215,9 @@
     
         <div class="company-header">
             <h1>LICKEES</h1>
-            <p style="font-size: 17px;"><b>Lick It Like It</b></p>
+            <p><b>Lick It Like It</b></p>
             <p>GST Number: 29AAGCE2994J1Z2</p>
-            <p>19,Kateramma Temple Rd,
-                Aduru,Bengaluru,Kithiganur,
-                Karnataka
-            </p>
+            <p>19, Kateramma Temple Rd, Bengaluru, Karnataka</p>
         </div>
 
         <h2>Create Invoice</h2>
@@ -292,10 +233,6 @@
                 <tr>
                     <th>Date</th>
                     <td><input type="date" name="date" required></td>
-                </tr>
-                <tr>
-                    <th>Invoice Number</th>
-                    <td><input type="text" name="invoice_number" required readonly></td>
                 </tr>
                 <tr>
                     <th>Discount (%)</th>
@@ -323,4 +260,7 @@
                 </div>
                 <button type="submit">Create Invoice</button>
             </div>
-       
+        </form>
+    </div>
+</body>
+</html>

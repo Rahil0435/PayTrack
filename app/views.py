@@ -90,87 +90,65 @@ def get_stock(request, product_id):
         return JsonResponse({'error': 'Product not found'}, status=404)
 
 def create_invoice(request):
-    invoice_form = InvoiceForm(request.POST or None)
+    products = Product.objects.all()  # Fetch all products for dropdown selection
+
+    # Get the last invoice number and increment it
+    last_invoice = Invoice.objects.aggregate(Max('invoice_number'))
+    last_invoice_number = last_invoice['invoice_number__max']
+    new_invoice_number = last_invoice_number + 1 if last_invoice_number else 1001  # Start from 1001 if no invoices exist
 
     if request.method == 'POST':
-        print("Received POST data:", request.POST)  # Debugging Step
+        form = InvoiceForm(request.POST)
 
-        if invoice_form.is_valid():
-            try:
-                with transaction.atomic():
-                    invoice = invoice_form.save(commit=False)
+        if form.is_valid():
+            customer_name = form.cleaned_data['customer']
+            date = form.cleaned_data['date']
+            discount_percentage = form.cleaned_data.get('discount_percentage', 0)
 
-                    # Generate unique invoice number in the backend
-                    base_invoice_number = f"INV-{timezone.now().strftime('%d%m%y')}-"
-                    number_part = 1
+            # Create the invoice with the new invoice number
+            invoice = Invoice.objects.create(
+                invoice_number=new_invoice_number,
+                customer=customer_name,
+                date=date,
+                discount_percentage=discount_percentage
+            )
 
-                    while Invoice.objects.filter(invoice_number=f"{base_invoice_number}{str(number_part).zfill(3)}").exists():
-                        number_part += 1
+            total_amount = 0  # Track total amount before discount
 
-                    new_invoice_number = f"{base_invoice_number}{str(number_part).zfill(3)}"
-                    invoice.invoice_number = new_invoice_number  # Overwriting any frontend value
-                    invoice.save()
+            products_selected = request.POST.getlist('products[]')
+            quantities = request.POST.getlist('quantities[]')
 
-                    # Fetch products and quantities from request
-                    products = request.POST.getlist('products[]')
-                    quantities = request.POST.getlist('quantities[]')
+            for product_id, quantity in zip(products_selected, quantities):
+                product = Product.objects.get(id=product_id)
+                quantity = int(quantity)
+                subtotal = product.price * quantity
+                total_amount += subtotal
 
-                    if not products or not quantities or len(products) != len(quantities):
-                        messages.error(request, "Please select at least one product.")
-                        raise ValueError("Invalid product or quantity data.")
+                # Create invoice item
+                InvoiceItem.objects.create(
+                    invoice=invoice,
+                    product=product,
+                    quantity=quantity,
+                    price=product.price,
+                    subtotal=subtotal
+                )
 
-                    total_amount = 0
+            # Apply discount
+            discount_amount = (total_amount * discount_percentage) / 100
+            final_total = total_amount - discount_amount
+            invoice.total_amount = final_total
+            invoice.save()
 
-                    for i in range(len(products)):
-                        product = get_object_or_404(Product, id=products[i])
-                        quantity = int(quantities[i])
-
-                        if product.quantity < quantity:
-                            messages.error(request, f"Insufficient stock for {product.name}")
-
-                        price = product.price
-                        subtotal = price * quantity
-                        total_amount += subtotal
-
-                        InvoiceItem.objects.create(
-                            invoice=invoice,
-                            product=product,
-                            quantity=quantity,
-                            price=price,
-                            subtotal=subtotal
-                        )
-
-                        # Reduce stock
-                        product.quantity -= quantity
-                        product.save()
-
-                    # Apply discount
-                    discount_percentage = invoice.discount_percentage
-                    discount_amount = (total_amount * discount_percentage) / 100
-                    final_amount = total_amount - discount_amount
-
-                    # Save final total amount
-                    invoice.total_amount = final_amount
-                    invoice.save()
-                    messages.success(request, "Invoice created successfully!")
-                    return redirect('invoicelist')
-
-            except ValueError as e:
-                messages.error(request, str(e))
-                print(f"ValueError: {e}")  # Debugging
-            except Exception as e:
-                messages.error(request, f"Error creating invoice: {e}")
-                print(f"Exception: {e}")  # Debugging
+            messages.success(request, f'Invoice #{invoice.invoice_number} created successfully!')
+            return redirect('invoice_list')  # Redirect to the invoice list page
 
         else:
-            print("Form Errors:", invoice_form.errors)  # Debugging
-            messages.error(request, "Form validation failed. Please check your inputs.")
+            messages.error(request, 'There was an error in the form submission.')
 
-    products = Product.objects.all()
-    return render(request, 'create invoice.html', {
-        'invoice_form': invoice_form,  # Pass the actual form instance
-        'products': products,
-    })
+    else:
+        form = InvoiceForm()
+
+    return render(request, 'create_invoice.html', {'form': form, 'products': products, 'invoice_number': new_invoice_number})
 
 
 def invoice_list(request):
