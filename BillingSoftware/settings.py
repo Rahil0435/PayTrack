@@ -63,11 +63,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'BillingSoftware.wsgi.application'
 
 DATABASES = {
-    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
 }
-
-if not DATABASES['default']:
-    raise ValueError("DATABASE_URL environment variable is not set.")
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
