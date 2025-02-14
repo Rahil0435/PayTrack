@@ -63,7 +63,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'BillingSoftware.wsgi.application'
 
 DATABASES = {
-    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'paytrack',
+        'USER': 'paytrack_user',
+        'PASSWORD': 'twaGEwWQfwgwH5O9C7LF3eJRxQjfpj6b',
+        'HOST': 'dpg-cungd21opnds73d6k41g-a',  
+        'PORT': '5432',  # Usually "5432"
+    }
 }
 
 # Password validation
