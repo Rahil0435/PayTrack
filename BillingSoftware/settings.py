@@ -62,10 +62,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'BillingSoftware.wsgi.application'
 
-DATABASES = {
-    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
-}
+DATABASE_URL = os.getenv('DATABASE_URL')
 
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'paytrack',
+            'USER': 'paytrack_user',
+            'PASSWORD': 'twaGEwWQfwgwH5O9C7LF3eJRxQjfpj6b',
+            'HOST': 'dpg-cungd21opnds73d6k41g-a',
+            'PORT': '5432',
+        }
+    }
+    
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
