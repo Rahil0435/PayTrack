@@ -100,7 +100,7 @@ def create_invoice(request):
                 with transaction.atomic():
                     invoice = invoice_form.save(commit=False)
 
-                    # Generate unique invoice number in the backend
+                    # Generate unique invoice number
                     base_invoice_number = f"INV-{timezone.now().strftime('%d%m%y')}-"
                     number_part = 1
 
@@ -108,7 +108,7 @@ def create_invoice(request):
                         number_part += 1
 
                     new_invoice_number = f"{base_invoice_number}{str(number_part).zfill(3)}"
-                    invoice.invoice_number = new_invoice_number  # Overwriting any frontend value
+                    invoice.invoice_number = new_invoice_number  # Ensure uniqueness
                     invoice.save()
 
                     # Fetch products and quantities from request
@@ -116,8 +116,8 @@ def create_invoice(request):
                     quantities = request.POST.getlist('quantities[]')
 
                     if not products or not quantities or len(products) != len(quantities):
-                        messages.error(request, "Please select at least one product.")
-                        raise ValueError("Invalid product or quantity data.")
+                        messages.error(request, "Please select at least one product and ensure quantities match.")
+                        raise ValueError("Product and quantity data mismatch.")
 
                     total_amount = 0
 
@@ -133,6 +133,7 @@ def create_invoice(request):
                         subtotal = price * quantity
                         total_amount += subtotal
 
+                        # Create invoice item
                         InvoiceItem.objects.create(
                             invoice=invoice,
                             product=product,
@@ -148,15 +149,13 @@ def create_invoice(request):
                     # Apply discount
                     discount_percentage = invoice.discount_percentage or 0
                     discount_amount = (total_amount * discount_percentage) / 100
-                    final_amount = total_amount - discount_amount
+                    final_amount = max(total_amount - discount_amount, 0)  # Prevent negative total
 
-                    # Ensure final amount isn't negative
-                    final_amount = max(final_amount, 0)
-
-                    # Save final total amount
+                    # Save total amount in invoice
                     invoice.total_amount = final_amount
                     invoice.save()
-                    messages.success(request, "Invoice created successfully!")
+
+                    messages.success(request, f"Invoice {new_invoice_number} created successfully!")
                     return redirect('invoicelist')
 
             except ValueError as e:
@@ -171,11 +170,11 @@ def create_invoice(request):
             messages.error(request, "Form validation failed. Please check your inputs.")
 
     products = Product.objects.all()
-    return render(request, 'create invoice.html', {
-        'invoice_form': invoice_form,  # Pass the actual form instance
+    return render(request, 'create_invoice.html', {  # Fixed incorrect filename
+        'invoice_form': invoice_form,
         'products': products,
     })
-
+    
 
 def invoice_list(request):
     invoices = Invoice.objects.all().order_by('-date')
