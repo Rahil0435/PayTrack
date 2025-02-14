@@ -102,19 +102,22 @@ def create_invoice(request):
 
                     # Generate new invoice number
                     latest_invoice = Invoice.objects.last()
-                    if latest_invoice:
+                    if latest_invoice and latest_invoice.invoice_number:
                         match = re.search(r'(\d+)$', latest_invoice.invoice_number)
-                        number_part = int(match.group(1)) + 1 if match else 1
-                        new_invoice_number = f"INV-{timezone.now().strftime('%d%m%y')}-{str(number_part).zfill(3)}"
+                        number_part = int(match.group(1)) + 1 if match and match.group(1).isdigit() else 1
                     else:
-                        new_invoice_number = f"INV-{timezone.now().strftime('%d%m%y')}-001"
+                        number_part = 1
 
+                    new_invoice_number = f"INV-{timezone.now().strftime('%d%m%y')}-{str(number_part).zfill(3)}"
                     invoice.invoice_number = new_invoice_number
                     invoice.save()
 
                     # Fetch products and quantities from request
                     products = request.POST.getlist('products[]')
                     quantities = request.POST.getlist('quantities[]')
+
+                    print("Products:", products)  # Debugging
+                    print("Quantities:", quantities)  # Debugging
 
                     if not products or not quantities or len(products) != len(quantities):
                         messages.error(request, "Please select at least one product.")
@@ -124,10 +127,15 @@ def create_invoice(request):
 
                     for i in range(len(products)):
                         product = get_object_or_404(Product, id=products[i])
-                        quantity = int(quantities[i])
+                        try:
+                            quantity = int(quantities[i])
+                        except ValueError:
+                            messages.error(request, f"Invalid quantity for {product.name}.")
+                            raise ValueError(f"Invalid quantity value: {quantities[i]}")
 
                         if product.quantity < quantity:
                             messages.error(request, f"Insufficient stock for {product.name}")
+                            raise ValueError(f"Insufficient stock for {product.name}")
 
                         price = product.price
                         subtotal = price * quantity
@@ -146,7 +154,7 @@ def create_invoice(request):
                         product.save()
 
                     # Apply discount
-                    discount_percentage = invoice.discount_percentage
+                    discount_percentage = invoice.discount_percentage or 0
                     discount_amount = (total_amount * discount_percentage) / 100
                     final_amount = total_amount - discount_amount
 
@@ -169,7 +177,7 @@ def create_invoice(request):
 
     products = Product.objects.all()
     return render(request, 'create invoice.html', {
-        'invoice_form': invoice_form,  # Pass the actual form instance
+        'invoice_form': invoice_form,  
         'products': products,
     })
 
