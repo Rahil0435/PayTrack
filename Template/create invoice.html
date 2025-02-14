@@ -283,6 +283,7 @@
 
         <form method="post">
             {% csrf_token %}
+            {{ form.as_p }}
             <table>
                 <tr>
                     <th>Customer</th>
