@@ -89,6 +89,23 @@ def get_stock(request, product_id):
     except Product.DoesNotExist:
         return JsonResponse({'error': 'Product not found'}, status=404)
 
+def generate_invoice_number():
+    """Generates a unique invoice number with automatic incrementation."""
+    today_date = timezone.now().strftime('%d%m%y')  # Format: DDMMYY
+    base_invoice_number = f"INV-{today_date}-"
+
+    # Get the latest invoice for today
+    latest_invoice = Invoice.objects.filter(invoice_number__startswith=base_invoice_number).order_by('-invoice_number').first()
+
+    if latest_invoice:
+        # Extract the last number and increment it
+        last_number = int(latest_invoice.invoice_number.split('-')[-1])
+        new_number = last_number + 1
+    else:
+        new_number = 1  # Start with 001 if no invoices exist for today
+
+    return f"{base_invoice_number}{str(new_number).zfill(3)}"  # Ensures format INV-DDMMYY-001
+
 def create_invoice(request):
     invoice_form = InvoiceForm(request.POST or None)
 
@@ -100,15 +117,8 @@ def create_invoice(request):
                 with transaction.atomic():
                     invoice = invoice_form.save(commit=False)
 
-                    # Generate unique invoice number
-                    base_invoice_number = f"INV-{timezone.now().strftime('%d%m%y')}-"
-                    number_part = 1
-
-                    while Invoice.objects.filter(invoice_number=f"{base_invoice_number}{str(number_part).zfill(3)}").exists():
-                        number_part += 1
-
-                    new_invoice_number = f"{base_invoice_number}{str(number_part).zfill(3)}"
-                    invoice.invoice_number = new_invoice_number  # Ensure uniqueness
+                    # Generate automatic unique invoice number
+                    invoice.invoice_number = generate_invoice_number()
                     invoice.save()
 
                     # Fetch products and quantities from request
@@ -116,8 +126,8 @@ def create_invoice(request):
                     quantities = request.POST.getlist('quantities[]')
 
                     if not products or not quantities or len(products) != len(quantities):
-                        messages.error(request, "Please select at least one product and ensure quantities match.")
-                        raise ValueError("Product and quantity data mismatch.")
+                        messages.error(request, "Please select at least one product.")
+                        raise ValueError("Invalid product or quantity data.")
 
                     total_amount = 0
 
@@ -133,7 +143,6 @@ def create_invoice(request):
                         subtotal = price * quantity
                         total_amount += subtotal
 
-                        # Create invoice item
                         InvoiceItem.objects.create(
                             invoice=invoice,
                             product=product,
@@ -151,11 +160,11 @@ def create_invoice(request):
                     discount_amount = (total_amount * discount_percentage) / 100
                     final_amount = max(total_amount - discount_amount, 0)  # Prevent negative total
 
-                    # Save total amount in invoice
+                    # Save final total amount
                     invoice.total_amount = final_amount
                     invoice.save()
 
-                    messages.success(request, f"Invoice {new_invoice_number} created successfully!")
+                    messages.success(request, f"Invoice {invoice.invoice_number} created successfully!")
                     return redirect('invoicelist')
 
             except ValueError as e:
@@ -174,7 +183,7 @@ def create_invoice(request):
         'invoice_form': invoice_form,
         'products': products,
     })
-    
+
 
 def invoice_list(request):
     invoices = Invoice.objects.all().order_by('-date')
