@@ -16,7 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "your-default-secret-key")
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = 'paytrack.onrender.com'
+ALLOWED_HOSTS = 'Paytrack.onrender.com'
 
 
 # Application definition
