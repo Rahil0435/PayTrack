@@ -32,13 +32,25 @@ class ProductionHistory(models.Model):
 class Invoice(models.Model):
     date = models.DateField()
     customer = models.CharField(max_length=30, default="Unknown Customer")
-    invoice_number = models.CharField(max_length=20, unique=True)
+    invoice_number = models.CharField(max_length=20, unique=True, blank=True)  # Allow blank to generate in save()
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def final_amount(self):
         discount_amount = (self.total_amount * self.discount_percentage) / 100  # Calculate discount
         return self.total_amount - discount_amount 
+
+    def save(self, *args, **kwargs):
+        if not self.invoice_number:  # Generate invoice number only if it's empty
+            last_invoice = Invoice.objects.order_by('-id').first()
+            if last_invoice:
+                last_number = int(last_invoice.invoice_number.split('-')[-1])  # Extract last number
+                new_number = f"INV-{self.date.strftime('%d%m%y')}-{last_number + 1:03d}"
+            else:
+                new_number = f"INV-{self.date.strftime('%d%m%y')}-001"
+            self.invoice_number = new_number
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.invoice_number

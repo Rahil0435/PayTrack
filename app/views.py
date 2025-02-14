@@ -89,23 +89,7 @@ def get_stock(request, product_id):
     except Product.DoesNotExist:
         return JsonResponse({'error': 'Product not found'}, status=404)
 
-import time  # For retry mechanism
 
-def generate_invoice_number():
-    """Generates a unique invoice number and handles race conditions."""
-    today_date = timezone.now().strftime('%d%m%y')  # Format: DDMMYY
-    base_invoice_number = f"INV-{today_date}-"
-
-    # Get the last invoice for today in a transaction-safe way
-    latest_invoice = Invoice.objects.filter(invoice_number__startswith=base_invoice_number).order_by('-invoice_number').first()
-
-    if latest_invoice:
-        last_number = int(latest_invoice.invoice_number.split('-')[-1])
-        new_number = last_number + 1
-    else:
-        new_number = 1  # Start from 001 if no invoices exist for today
-
-    return f"{base_invoice_number}{str(new_number).zfill(3)}"
 
 def create_invoice(request):
     invoice_form = InvoiceForm(request.POST or None)
@@ -114,18 +98,18 @@ def create_invoice(request):
         print("Received POST data:", request.POST)  # Debugging
 
         if invoice_form.is_valid():
-            retry_attempts = 5  # Number of times to retry in case of duplicate errors
+            retry_attempts = 2  
 
             for attempt in range(retry_attempts):
                 try:
-                    with transaction.atomic():  # Ensures safe concurrent execution
+                    with transaction.atomic():  
                         invoice = invoice_form.save(commit=False)
 
-                        # Generate unique invoice number safely
-                        invoice.invoice_number = generate_invoice_number()
+                       
+                        invoice.invoice_number = ""
                         invoice.save()
 
-                        # Fetch products and quantities from request
+                        
                         products = request.POST.getlist('products[]')
                         quantities = request.POST.getlist('quantities[]')
 

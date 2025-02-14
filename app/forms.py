@@ -16,19 +16,17 @@ class ProductionForm(forms.ModelForm):
 class InvoiceForm(forms.ModelForm):
     class Meta:
         model = Invoice
-        fields = ['customer', 'discount_percentage', 'date', 'invoice_number']
+        fields = ['customer', 'discount_percentage', 'date', ]
         widgets = {
             'discount_percentage': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'max': '100', 'value': '0', 'step': '0.01'}),
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'invoice_number': forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),  # Read-only Invoice Number
+            
         }
 
     def save(self, commit=True):
         invoice = super().save(commit=False)
         if not invoice.date:
             invoice.date = timezone.now().date()  
-        if not invoice.invoice_number:
-            invoice.invoice_number = f"INV-{timezone.now().strftime('%Y%m%d')}-001"  # Auto-generate invoice number
         if commit:
             invoice.save()
         return invoice
