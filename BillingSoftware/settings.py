@@ -5,6 +5,8 @@ Django settings for BillingSoftware project.
 import os
 import dj_database_url
 from pathlib import Path
+import sys
+
 
 
 
@@ -62,13 +64,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'BillingSoftware.wsgi.application'
 
-DATABASE_URL = os.getenv('DATABASE_URL')
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
+    print(f"✅ Using DATABASE_URL: {DATABASE_URL}", file=sys.stderr)
     DATABASES = {
         'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
     }
 else:
+    print("⚠️ WARNING: DATABASE_URL is not set! Using fallback credentials.", file=sys.stderr)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
