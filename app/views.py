@@ -179,7 +179,7 @@ def create_invoice(request):
             messages.error(request, "Form validation failed. Please check your inputs.")
 
     products = Product.objects.all()
-    return render(request, 'create_invoice.html', {  # Fixed incorrect filename
+    return render(request, 'create invoice.html', {  # Fixed incorrect filename
         'invoice_form': invoice_form,
         'products': products,
     })
