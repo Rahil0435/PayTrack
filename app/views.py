@@ -126,7 +126,8 @@ def create_invoice(request):
                         quantity = int(quantities[i])
 
                         if product.quantity < quantity:
-                            messages.error(request, f"Insufficient stock for {product.name}")
+                            messages.error(request, f"Insufficient stock for {product.name}. Available: {product.quantity}")
+                            raise ValueError("Stock validation failed.")
 
                         price = product.price
                         subtotal = price * quantity
@@ -145,9 +146,12 @@ def create_invoice(request):
                         product.save()
 
                     # Apply discount
-                    discount_percentage = invoice.discount_percentage
+                    discount_percentage = invoice.discount_percentage or 0
                     discount_amount = (total_amount * discount_percentage) / 100
                     final_amount = total_amount - discount_amount
+
+                    # Ensure final amount isn't negative
+                    final_amount = max(final_amount, 0)
 
                     # Save final total amount
                     invoice.total_amount = final_amount

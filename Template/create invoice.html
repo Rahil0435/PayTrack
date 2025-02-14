@@ -140,7 +140,7 @@
 
             row.innerHTML = `
                 <td>
-                    <select name="products[]" class="product-select" onchange="updatePrice(this)">
+                    <select name="products[]" class="product-select" onchange="updatePrice(this)" required>
                         <option value="" disabled selected>Select a product</option>
                         {% for product in products %}
                         <option value="{{ product.id }}" data-price="{{ product.price }}">
@@ -149,7 +149,7 @@
                         {% endfor %}
                     </select>
                 </td>
-                <td><input type="number" name="quantities[]" class="quantity-input" min="1" value="1" onchange="updateSubtotal(this)"></td>
+                <td><input type="number" name="quantities[]" class="quantity-input" min="1" value="1" onchange="updateSubtotal(this)" required></td>
                 <td class="price-cell">0</td>
                 <td class="subtotal-cell">0</td>
                 <td><button type="button" onclick="removeRow(this)">Remove</button></td>
@@ -163,15 +163,22 @@
         }
 
         function updatePrice(select) {
-            const priceCell = select.closest('tr').querySelector('.price-cell');
-            const price = select.options[select.selectedIndex].getAttribute('data-price');
+            const row = select.closest('tr');
+            const priceCell = row.querySelector('.price-cell');
+            const subtotalCell = row.querySelector('.subtotal-cell');
+            const quantityInput = row.querySelector('.quantity-input');
+
+            const price = select.options[select.selectedIndex].getAttribute('data-price') || 0;
             priceCell.textContent = price;
-            updateSubtotal(select);
+
+            // Ensure subtotal updates when product changes
+            subtotalCell.textContent = (quantityInput.value * price).toFixed(2);
+            updateTotal();
         }
 
         function updateSubtotal(input) {
             const row = input.closest('tr');
-            const quantity = row.querySelector('.quantity-input').value;
+            const quantity = input.value;
             const price = row.querySelector('.price-cell').textContent || 0;
             const subtotalCell = row.querySelector('.subtotal-cell');
             subtotalCell.textContent = (quantity * price).toFixed(2);
@@ -187,7 +194,7 @@
             let discountPercentage = parseFloat(document.getElementById('discountInput').value) || 0;
             let discountAmount = (total * discountPercentage) / 100;
             let finalTotal = total - discountAmount;
-            
+
             if (finalTotal < 0) {
                 finalTotal = 0;  // Prevent negative total
             }
@@ -211,7 +218,7 @@
                 <button onclick="this.parentElement.style.display='none'">&times;</button>
             </div>
         {% endfor %}
-    {% endif %}
+        {% endif %}
     
         <div class="company-header">
             <h1>LICKEES</h1>
@@ -224,7 +231,8 @@
 
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
+            {{ form.non_field_errors }}
+
             <table>
                 <tr>
                     <th>Customer</th>
