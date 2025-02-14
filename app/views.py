@@ -89,101 +89,105 @@ def get_stock(request, product_id):
     except Product.DoesNotExist:
         return JsonResponse({'error': 'Product not found'}, status=404)
 
+import time  # For retry mechanism
+
 def generate_invoice_number():
-    """Generates a unique invoice number with automatic incrementation."""
+    """Generates a unique invoice number and handles race conditions."""
     today_date = timezone.now().strftime('%d%m%y')  # Format: DDMMYY
     base_invoice_number = f"INV-{today_date}-"
 
-    # Get the latest invoice for today
+    # Get the last invoice for today in a transaction-safe way
     latest_invoice = Invoice.objects.filter(invoice_number__startswith=base_invoice_number).order_by('-invoice_number').first()
 
     if latest_invoice:
-        # Extract the last number and increment it
         last_number = int(latest_invoice.invoice_number.split('-')[-1])
         new_number = last_number + 1
     else:
-        new_number = 1  # Start with 001 if no invoices exist for today
+        new_number = 1  # Start from 001 if no invoices exist for today
 
-    return f"{base_invoice_number}{str(new_number).zfill(3)}"  # Ensures format INV-DDMMYY-001
+    return f"{base_invoice_number}{str(new_number).zfill(3)}"
 
 def create_invoice(request):
     invoice_form = InvoiceForm(request.POST or None)
 
     if request.method == 'POST':
-        print("Received POST data:", request.POST)  # Debugging Step
+        print("Received POST data:", request.POST)  # Debugging
 
         if invoice_form.is_valid():
-            try:
-                with transaction.atomic():
-                    invoice = invoice_form.save(commit=False)
+            retry_attempts = 5  # Number of times to retry in case of duplicate errors
 
-                    # Generate automatic unique invoice number
-                    invoice.invoice_number = generate_invoice_number()
-                    invoice.save()
+            for attempt in range(retry_attempts):
+                try:
+                    with transaction.atomic():  # Ensures safe concurrent execution
+                        invoice = invoice_form.save(commit=False)
 
-                    # Fetch products and quantities from request
-                    products = request.POST.getlist('products[]')
-                    quantities = request.POST.getlist('quantities[]')
+                        # Generate unique invoice number safely
+                        invoice.invoice_number = generate_invoice_number()
+                        invoice.save()
 
-                    if not products or not quantities or len(products) != len(quantities):
-                        messages.error(request, "Please select at least one product.")
-                        raise ValueError("Invalid product or quantity data.")
+                        # Fetch products and quantities from request
+                        products = request.POST.getlist('products[]')
+                        quantities = request.POST.getlist('quantities[]')
 
-                    total_amount = 0
+                        if not products or not quantities or len(products) != len(quantities):
+                            messages.error(request, "Please select at least one product.")
+                            raise ValueError("Invalid product or quantity data.")
 
-                    for i in range(len(products)):
-                        product = get_object_or_404(Product, id=products[i])
-                        quantity = int(quantities[i])
+                        total_amount = 0
 
-                        if product.quantity < quantity:
-                            messages.error(request, f"Insufficient stock for {product.name}. Available: {product.quantity}")
-                            raise ValueError("Stock validation failed.")
+                        for i in range(len(products)):
+                            product = get_object_or_404(Product, id=products[i])
+                            quantity = int(quantities[i])
 
-                        price = product.price
-                        subtotal = price * quantity
-                        total_amount += subtotal
+                            if product.quantity < quantity:
+                                messages.error(request, f"Insufficient stock for {product.name}. Available: {product.quantity}")
+                                raise ValueError("Stock validation failed.")
 
-                        InvoiceItem.objects.create(
-                            invoice=invoice,
-                            product=product,
-                            quantity=quantity,
-                            price=price,
-                            subtotal=subtotal
-                        )
+                            price = product.price
+                            subtotal = price * quantity
+                            total_amount += subtotal
 
-                        # Reduce stock
-                        product.quantity -= quantity
-                        product.save()
+                            InvoiceItem.objects.create(
+                                invoice=invoice,
+                                product=product,
+                                quantity=quantity,
+                                price=price,
+                                subtotal=subtotal
+                            )
 
-                    # Apply discount
-                    discount_percentage = invoice.discount_percentage or 0
-                    discount_amount = (total_amount * discount_percentage) / 100
-                    final_amount = max(total_amount - discount_amount, 0)  # Prevent negative total
+                            # Reduce stock
+                            product.quantity -= quantity
+                            product.save()
 
-                    # Save final total amount
-                    invoice.total_amount = final_amount
-                    invoice.save()
+                        # Apply discount
+                        discount_percentage = invoice.discount_percentage or 0
+                        discount_amount = (total_amount * discount_percentage) / 100
+                        final_amount = max(total_amount - discount_amount, 0)  # Prevent negative total
 
-                    messages.success(request, f"Invoice {invoice.invoice_number} created successfully!")
-                    return redirect('invoicelist')
+                        # Save final total amount
+                        invoice.total_amount = final_amount
+                        invoice.save()
 
-            except ValueError as e:
-                messages.error(request, str(e))
-                print(f"ValueError: {e}")  # Debugging
-            except Exception as e:
-                messages.error(request, f"Error creating invoice: {e}")
-                print(f"Exception: {e}")  # Debugging
+                        messages.success(request, f"Invoice {invoice.invoice_number} created successfully!")
+                        return redirect('invoicelist')
+
+                except IntegrityError:
+                    # If a duplicate invoice number error occurs, retry with a delay
+                    print(f"Retrying... Attempt {attempt + 1}")
+                    time.sleep(0.5)  # Small delay before retrying
+
+            messages.error(request, "Invoice creation failed due to duplicate invoice number.")
+            return redirect('create_invoice')
 
         else:
             print("Form Errors:", invoice_form.errors)  # Debugging
             messages.error(request, "Form validation failed. Please check your inputs.")
 
     products = Product.objects.all()
-    return render(request, 'create invoice.html', {  # Fixed incorrect filename
+    return render(request, 'create invoice.html', {
         'invoice_form': invoice_form,
         'products': products,
     })
-
 
 def invoice_list(request):
     invoices = Invoice.objects.all().order_by('-date')
