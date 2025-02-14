@@ -100,7 +100,7 @@ def create_invoice(request):
                 with transaction.atomic():
                     invoice = invoice_form.save(commit=False)
 
-                    # Generate unique invoice number
+                    # Generate unique invoice number in the backend
                     base_invoice_number = f"INV-{timezone.now().strftime('%d%m%y')}-"
                     number_part = 1
 
@@ -108,7 +108,7 @@ def create_invoice(request):
                         number_part += 1
 
                     new_invoice_number = f"{base_invoice_number}{str(number_part).zfill(3)}"
-                    invoice.invoice_number = new_invoice_number
+                    invoice.invoice_number = new_invoice_number  # Overwriting any frontend value
                     invoice.save()
 
                     # Fetch products and quantities from request
@@ -171,6 +171,7 @@ def create_invoice(request):
         'invoice_form': invoice_form,  # Pass the actual form instance
         'products': products,
     })
+
 
 def invoice_list(request):
     invoices = Invoice.objects.all().order_by('-date')
