@@ -13,6 +13,8 @@ from django.template.loader import render_to_string
 from django.db.models import Max
 from django.utils import timezone
 import re
+from django.db import connection
+
 
 
 # Create your views here.
@@ -267,3 +269,12 @@ def generate_pdf(request, invoice_id):
         return HttpResponse("Error generating PDF", status=500)
 
     return response
+
+
+def db_status(request):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+        return JsonResponse({"status": "Database connected!"})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

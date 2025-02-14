@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 import app.views
 from django.http import HttpResponseNotFound
+from django.views.generic import RedirectView
 
 def favicon_view(request):
     return HttpResponseNotFound()
@@ -28,7 +29,7 @@ def favicon_view(request):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("favicon.ico", favicon_view),
+    path("favicon.ico", RedirectView.as_view(url="/static/favicon.ico", permanent=True)),
     path('', app.views.Home, name='home'),
     path('form/', app.views.registration, name='form'),
     path('login/', app.views.Login, name='login'),
@@ -43,6 +44,7 @@ urlpatterns = [
     path('invoice/<int:invoice_id>/',app.views.invoice_detail, name='invoice_detail'),
     path('logout/',app.views.logoutview, name='logout'),
     path('invoice/<int:invoice_id>/pdf/',app.views.generate_pdf, name='generate_pdf'),
+     path("db-status/", app.views.db_status, name="db_status"),
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
