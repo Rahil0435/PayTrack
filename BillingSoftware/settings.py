@@ -16,7 +16,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "your-default-secret-key")
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = 'Paytrack.onrender.com'
+ALLOWED_HOSTS = ["yourdomain.com", "your-render-app.onrender.com", "localhost", "127.0.0.1"]
+
 
 
 # Application definition
@@ -62,7 +63,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'BillingSoftware.wsgi.application'
 
 DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 }
 
 # Password validation
