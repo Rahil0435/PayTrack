@@ -75,11 +75,11 @@ else:
             'NAME': 'paytrack',
             'USER': 'paytrack_user',
             'PASSWORD': 'twaGEwWQfwgwH5O9C7LF3eJRxQjfpj6b',
-            'HOST': 'dpg-cungd21opnds73d6k41g-a',
+            'HOST': 'dpg-cungd21opnds73d6k41g-a.singapore-postgres.render.com',
             'PORT': '5432',
         }
     }
-    
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
