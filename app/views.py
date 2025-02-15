@@ -278,3 +278,13 @@ def db_status(request):
         return JsonResponse({"status": "Database connected!"})
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+def delete_invoice(request, invoice_id):
+    invoice = get_object_or_404(Invoice, id=invoice_id)
+
+    if request.method == 'POST':  
+        invoice.delete()
+        messages.success(request, "Invoice deleted successfully!")
+        return redirect('invoicelist')
+
+    return redirect('invoicelist')
