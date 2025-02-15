@@ -284,8 +284,16 @@ def db_status(request):
 def delete_invoice(request, invoice_id):
     if request.method == 'POST':  # Only allow POST
         invoice = get_object_or_404(Invoice, id=invoice_id)
-        invoice.delete()
-        messages.success(request, f"Invoice {invoice.invoice_number} deleted successfully!")
+
+        # Restore product quantities before deleting the invoice
+        invoice_items = InvoiceItem.objects.filter(invoice=invoice)
+        for item in invoice_items:
+            product = item.product
+            product.quantity += item.quantity  # Restoring the quantity
+            product.save()
+
+        invoice.delete()  # Now delete the invoice
+        messages.success(request, f"Invoice {invoice.invoice_number} deleted successfully! Product stock has been updated.")
         return redirect('invoicelist')
 
     return HttpResponseNotAllowed(['POST']) 
