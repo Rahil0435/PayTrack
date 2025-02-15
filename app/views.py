@@ -77,7 +77,7 @@ def add_production(request):
 
 def product_list(request):
     products = Product.objects.all().order_by('price')  # Sorting by price (ascending)
-    return render(request, 'stock_list.html', {'products': products})
+    return render(request, 'Stock_list.html', {'products': products})
 
 def production_history(request):
     history = ProductionHistory.objects.all()
