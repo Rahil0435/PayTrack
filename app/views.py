@@ -14,6 +14,7 @@ from django.db.models import Max
 from django.utils import timezone
 import re
 from django.db import connection
+from django.http import HttpResponseNotAllowed
 
 
 
@@ -279,12 +280,12 @@ def db_status(request):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
-def delete_invoice(request, invoice_id):
-    invoice = get_object_or_404(Invoice, id=invoice_id)
 
-    if request.method == 'POST':  
+def delete_invoice(request, invoice_id):
+    if request.method == 'POST':  # Only allow POST
+        invoice = get_object_or_404(Invoice, id=invoice_id)
         invoice.delete()
-        messages.success(request, "Invoice deleted successfully!")
+        messages.success(request, f"Invoice {invoice.invoice_number} deleted successfully!")
         return redirect('invoicelist')
 
-    return redirect('invoicelist')
+    return HttpResponseNotAllowed(['POST']) 
