@@ -46,8 +46,7 @@
             margin-top: 20px;
         }
 
-        th,
-        td {
+        th, td {
             padding: 10px;
             border: 1px solid #ddd;
             text-align: left;
@@ -74,8 +73,7 @@
             justify-content: center;
         }
 
-        button,
-        .download-button {
+        button {
             background-color: #007BFF;
             color: white;
             padding: 10px 15px;
@@ -83,13 +81,10 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 14px;
-            text-decoration: none;
-            text-align: center;
             transition: background-color 0.3s ease;
         }
 
-        button:hover,
-        .download-button:hover {
+        button:hover {
             background-color: #0056b3;
         }
 
@@ -119,14 +114,12 @@
                 margin: 10px;
             }
 
-            th,
-            td {
+            th, td {
                 font-size: 14px;
                 padding: 8px;
             }
 
-            button,
-            .download-button {
+            button {
                 padding: 8px 12px;
                 font-size: 12px;
             }
@@ -141,14 +134,12 @@
                 font-size: 10px;
             }
 
-            th,
-            td {
+            th, td {
                 font-size: 12px;
                 padding: 6px;
             }
 
-            button,
-            .download-button {
+            button {
                 padding: 6px 10px;
                 font-size: 10px;
             }
@@ -173,17 +164,17 @@
     <script>
         /* Print Invoice */
         function printInvoice() {
-            const printContent = document.querySelector('.invoice-container'); // Select invoice content
-            const originalContent = document.body.innerHTML; // Save the original content
+            const printContent = document.querySelector('.invoice-container'); 
+            const originalContent = document.body.innerHTML; 
 
-            document.body.innerHTML = printContent.innerHTML; // Replace body with the invoice content
-            window.print(); // Trigger print
+            document.body.innerHTML = printContent.innerHTML;
+            window.print();
             document.body.innerHTML = originalContent; 
         }
 
         /* Download Invoice as PDF */
         function downloadInvoice() {
-            const element = document.querySelector('.invoice-container'); // Target the content container
+            const element = document.querySelector('.invoice-container'); 
             const options = {
                 margin: 0.5,
                 filename: 'invoice.pdf',
@@ -205,10 +196,7 @@
             <h1>LICKEES</h1>
             <p style="font-size: 17px;"><b>Lick It Like It</b></p>
             <p>GST Number: 29AAGCE2994J1Z2</p>
-            <p>19,Kateramma Temple Rd,
-                Aduru,Bengaluru,Kithiganur,
-                Karnataka
-            </p>
+            <p>19,Kateramma Temple Rd, Aduru, Bengaluru, Kithiganur, Karnataka</p>
             <p>Invoice No: {{ invoice.invoice_number }}</p>
         </div>
 
@@ -219,6 +207,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>S.No</th>
                         <th>Product</th>
                         <th>Quantity</th>
                         <th>Price</th>
@@ -228,6 +217,7 @@
                 <tbody>
                     {% for item in items %}
                     <tr>
+                        <td>{{ forloop.counter }}</td> 
                         <td>{{ item.product.name }}</td>
                         <td>{{ item.quantity }}</td>
                         <td>₹{{ item.price }}</td>
@@ -252,6 +242,7 @@
         <p>Thank you for your business!</p>
         <p>If you have any questions about this invoice, please contact us at contact@lickees.com</p>
     </div>
+
 </body>
 
 </html>
