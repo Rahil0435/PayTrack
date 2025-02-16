@@ -15,10 +15,13 @@ from django.utils import timezone
 import re
 from django.db import connection
 from django.http import HttpResponseNotAllowed
+from django.views.decorators.cache import never_cache
+from django.http import HttpResponseRedirect
 
 
 
 # Create your views here.
+@never_cache
 def Home(request):
     template = loader.get_template("base.html")
     context = {}
@@ -209,8 +212,7 @@ def Login(request):
                 return HttpResponse("<script>alert('Welcome User');window.location='/userhome';</script>")
 
         except login.DoesNotExist:
-            messages.error(request, "Invalid username or password.")
-            return redirect('/login')
+            return HttpResponse("<script>alert('Invalid username or password.');window.location='/login';</script>")
 
     template = loader.get_template("login.html")
     context = {}
@@ -241,8 +243,15 @@ def userhome(request):
     return HttpResponse(template.render(context, request))
 
 def logoutview(request):
-    logout(request) 
-    return HttpResponse("<script>alert('Logout successfully');window.location='/login';</script>")
+    logout(request)  # Logs out the user
+    request.session.flush()  # Clears session data
+
+    response = redirect('login')  # Redirects to login page
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+
+    return response
 
 def generate_pdf(request, invoice_id):
     # Fetch invoice data from your database
@@ -272,28 +281,19 @@ def generate_pdf(request, invoice_id):
     return response
 
 
-def db_status(request):
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT 1")
-        return JsonResponse({"status": "Database connected!"})
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
-
 
 def delete_invoice(request, invoice_id):
     if request.method == 'POST':  # Only allow POST
         invoice = get_object_or_404(Invoice, id=invoice_id)
 
-        # Restore product quantities before deleting the invoice
         invoice_items = InvoiceItem.objects.filter(invoice=invoice)
         for item in invoice_items:
             product = item.product
-            product.quantity += item.quantity  # Restoring the quantity
+            product.quantity += item.quantity  
             product.save()
 
         invoice.delete()  # Now delete the invoice
         messages.success(request, f"Invoice {invoice.invoice_number} deleted successfully! Product stock has been updated.")
-        return redirect('invoicelist')
+        return HttpResponse("<script>alert('Invoice deleted successfully! Product stock has been updated.');window.location='/invoicelist';</script>")
 
     return HttpResponseNotAllowed(['POST']) 

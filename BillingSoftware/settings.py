@@ -7,6 +7,7 @@ import dj_database_url
 from pathlib import Path
 import sys
 
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -45,6 +46,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'app.middleware.PreventBackAfterLogoutMiddleware',
 ]
 
 ROOT_URLCONF = 'BillingSoftware.urls'

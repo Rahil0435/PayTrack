@@ -238,12 +238,22 @@
                 <th>Name</th>
                 <th>Price</th>
                 <th>Current Stock</th>
+                <th>Stock Status</th>
             </tr>
             {% for product in products %}
             <tr>
                 <td>{{ product.name }}</td>
                 <td>{{ product.price }}</td>
                 <td>{{ product.quantity }}</td>
+                <td>
+                    {% if product.quantity == 0 %}
+                        <span style="color: red; font-weight: bold;">Out of Stock</span>
+                    {% elif product.quantity <= 10 %}
+                        <span style="color: orange; font-weight: bold;">Low Stock</span>
+                    {% else %}
+                        <span style="color: green; font-weight: bold;">In Stock</span>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </table>

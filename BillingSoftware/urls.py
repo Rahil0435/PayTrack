@@ -44,7 +44,6 @@ urlpatterns = [
     path('invoice/<int:invoice_id>/',app.views.invoice_detail, name='invoice_detail'),
     path('logout/',app.views.logoutview, name='logout'),
     path('invoice/<int:invoice_id>/pdf/',app.views.generate_pdf, name='generate_pdf'),
-    path("db-status/", app.views.db_status, name="db_status"),
     path('invoice/delete/<int:invoice_id>/',app.views.delete_invoice, name='delete_invoice'),
 
 
