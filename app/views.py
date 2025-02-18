@@ -3,7 +3,7 @@ from django.template import loader
 from django.http import HttpResponse, JsonResponse
 from .models import Product, Production, ProductionHistory, Invoice, InvoiceItem, reg, login
 from .forms import ProductionForm, ProductForm, InvoiceForm
-from django.db import transaction
+from django.db import transaction,IntegrityError
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.contrib.auth import logout
@@ -16,7 +16,7 @@ import re
 from django.db import connection
 from django.http import HttpResponseNotAllowed
 from django.views.decorators.cache import never_cache
-from django.http import HttpResponseRedirect
+from django.db.models import F
 
 
 
@@ -89,93 +89,86 @@ def production_history(request):
 def get_stock(request, product_id):
     try:
         product = Product.objects.get(id=product_id)
-        return JsonResponse({'stock': product.quantity})  
+        return JsonResponse({'product_name': product.name, 'stock': product.quantity})    
     except Product.DoesNotExist:
         return JsonResponse({'error': 'Product not found'}, status=404)
-
-
-
-def create_invoice(request):
+    
+def createinvoice(request):  # Updated function name to match your path
     invoice_form = InvoiceForm(request.POST or None)
 
     if request.method == 'POST':
-        print("Received POST data:", request.POST)  # Debugging
-
         if invoice_form.is_valid():
-            retry_attempts = 2  
+            try:
+                with transaction.atomic():
+                    invoice = invoice_form.save(commit=False)
+                    invoice.invoice_number = ""
+                    invoice.save()
 
-            for attempt in range(retry_attempts):
-                try:
-                    with transaction.atomic():  
-                        invoice = invoice_form.save(commit=False)
+                    products = request.POST.getlist('products[]')
+                    quantities = request.POST.getlist('quantities[]')
 
-                       
-                        invoice.invoice_number = ""
-                        invoice.save()
+                    if not products or not quantities or len(products) != len(quantities):
+                        messages.error(request, "Please select at least one product.")
+                        return redirect('createinvoice')  # Redirect back if no valid items
 
-                        
-                        products = request.POST.getlist('products[]')
-                        quantities = request.POST.getlist('quantities[]')
+                    total_amount = 0
+                    valid_items = []
 
-                        if not products or not quantities or len(products) != len(quantities):
-                            messages.error(request, "Please select at least one product.")
-                            raise ValueError("Invalid product or quantity data.")
+                    for i in range(len(products)):
+                        product = get_object_or_404(Product, id=products[i])
+                        quantity = int(quantities[i])
 
-                        total_amount = 0
-
-                        for i in range(len(products)):
-                            product = get_object_or_404(Product, id=products[i])
-                            quantity = int(quantities[i])
-
-                            if product.quantity < quantity:
-                                messages.error(request, f"Insufficient stock for {product.name}. Available: {product.quantity}")
-                                raise ValueError("Stock validation failed.")
-
+                        if product.quantity >= quantity:  # Automatically skip out-of-stock items
                             price = product.price
                             subtotal = price * quantity
                             total_amount += subtotal
 
-                            InvoiceItem.objects.create(
-                                invoice=invoice,
-                                product=product,
-                                quantity=quantity,
-                                price=price,
-                                subtotal=subtotal
-                            )
+                            # Store valid items
+                            valid_items.append({
+                                'invoice': invoice,
+                                'product': product,
+                                'quantity': quantity,
+                                'price': price,
+                                'subtotal': subtotal
+                            })
 
-                            # Reduce stock
-                            product.quantity -= quantity
-                            product.save()
+                    if valid_items:
+                        # Save valid invoice items
+                        for item in valid_items:
+                            InvoiceItem.objects.create(**item)
+                            item['product'].quantity -= item['quantity']
+                            item['product'].save()
 
                         # Apply discount
                         discount_percentage = invoice.discount_percentage or 0
                         discount_amount = (total_amount * discount_percentage) / 100
-                        final_amount = max(total_amount - discount_amount, 0)  # Prevent negative total
+                        final_amount = max(total_amount - discount_amount, 0)
 
                         # Save final total amount
                         invoice.total_amount = final_amount
                         invoice.save()
 
-                        messages.success(request, f"Invoice {invoice.invoice_number} created successfully!")
+                        messages.success(request, f"Invoice {invoice.invoice_number} created successfully! Skipped out-of-stock items.")
                         return redirect('invoicelist')
 
-                except IntegrityError:
-                    # If a duplicate invoice number error occurs, retry with a delay
-                    print(f"Retrying... Attempt {attempt + 1}")
-                    time.sleep(0.5)  # Small delay before retrying
+                    else:
+                        invoice.delete()  # No valid items, delete empty invoice
+                        messages.error(request, "No products available to create an invoice.")
 
-            messages.error(request, "Invoice creation failed due to duplicate invoice number.")
-            return redirect('create_invoice')
+            except IntegrityError:
+                messages.error(request, "Invoice creation failed due to a system error. Please try again.")
+            except Exception as e:
+                messages.error(request, f"An unexpected error occurred: {e}")
 
         else:
-            print("Form Errors:", invoice_form.errors)  # Debugging
             messages.error(request, "Form validation failed. Please check your inputs.")
 
     products = Product.objects.all()
-    return render(request, 'create invoice.html', {
+    return render(request, 'create invoice.html', {  # Uses your template name
         'invoice_form': invoice_form,
         'products': products,
     })
+
 
 def invoice_list(request):
     invoices = Invoice.objects.all().order_by('-date')

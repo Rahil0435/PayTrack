@@ -39,12 +39,13 @@ urlpatterns = [
     path('productlist/',app.views.product_list, name='productlist'),
     path('productionhistory/', app.views.production_history, name='productionhistory'),
     path('get_stock/<int:product_id>/',app.views.get_stock, name='get_stock'),
-    path('createinvoice/',app.views.create_invoice,name='createinvoice'),
+    path('createinvoice/',app.views.createinvoice,name='createinvoice'),
     path('invoicelist/',app.views.invoice_list, name='invoicelist'),
     path('invoice/<int:invoice_id>/',app.views.invoice_detail, name='invoice_detail'),
     path('logout/',app.views.logoutview, name='logout'),
     path('invoice/<int:invoice_id>/pdf/',app.views.generate_pdf, name='generate_pdf'),
     path('invoice/delete/<int:invoice_id>/',app.views.delete_invoice, name='delete_invoice'),
+
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

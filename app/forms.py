@@ -16,19 +16,24 @@ class ProductionForm(forms.ModelForm):
 class InvoiceForm(forms.ModelForm):
     class Meta:
         model = Invoice
-        fields = ['customer', 'discount_percentage', 'date', ]
+        fields = ['customer', 'discount_percentage', 'date']
         widgets = {
             'discount_percentage': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'max': '100', 'value': '0', 'step': '0.01'}),
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            
         }
 
     def save(self, commit=True):
+        # Call the parent save method without committing it to the database
         invoice = super().save(commit=False)
+
+        # If the date field is not provided, set it to today's date
         if not invoice.date:
-            invoice.date = timezone.now().date()  
+            invoice.date = timezone.now().date()  # Default to the current date if not provided
+
+        # Save the instance to the database
         if commit:
             invoice.save()
+
         return invoice
 
 
@@ -59,3 +64,4 @@ class InvoiceWithItemsForm(forms.Form):
             raise forms.ValidationError("Please add at least one product.")
 
         return cleaned_data
+

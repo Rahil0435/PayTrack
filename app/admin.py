@@ -20,3 +20,11 @@ class loginAdmin(admin.ModelAdmin):
 @admin.register(Production)
 class ProductionAdmin(admin.ModelAdmin):
     list_display = ( 'product', 'quantity_added')
+
+@admin.register(InvoiceItem)
+class InvoiceitemAdmin(admin.ModelAdmin):
+    list_display=('product','quantity')
+
+@admin.register(ProductionHistory)
+class productionhitoryAdmin(admin.ModelAdmin):
+    list_display=('product', 'quantity_produced','date')
