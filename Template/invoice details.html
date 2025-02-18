@@ -145,45 +145,111 @@
             }
         }
 
-        /* Print Styles */
         @media print {
-            body {
-                margin: 0;
-            }
+    body {
+        font-size: 12px; /* Reduce global font size */
+        margin: 10px;
+    }
 
-            .buttons {
-                display: none;
-            }
+    .invoice-container {
+        width: 100%;
+        font-size: 12px;
+    }
 
-            .footer {
-                page-break-before: auto;
-            }
-        }
+    .header h1 {
+        font-size: 20px;
+    }
+
+    .header p {
+        font-size: 12px;
+    }
+
+    table {
+        font-size: 12px;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        padding: 4px; /* Reduce padding */
+        border: 1px solid #ccc;
+    }
+
+    th {
+        font-size: 12px;
+    }
+
+    td {
+        font-size: 11px;
+    }
+
+    /* Prevent table row from breaking between pages */
+    tr {
+        page-break-inside: avoid;
+    }
+
+    /* Reduce paper usage */
+    .content {
+        margin: 5px;
+    }
+
+    .buttons {
+        display: none; /* Hide buttons while printing */
+    }
+
+    .footer {
+        font-size: 10px;
+    }
+}
+
     </style>
 
     <script>
         /* Print Invoice */
         function printInvoice() {
-            const printContent = document.querySelector('.invoice-container'); 
-            const originalContent = document.body.innerHTML; 
+    const printContent = document.querySelector('.invoice-container'); 
+    const originalContent = document.body.innerHTML; 
 
-            document.body.innerHTML = printContent.innerHTML;
-            window.print();
-            document.body.innerHTML = originalContent; 
-        }
+    document.body.innerHTML = printContent.innerHTML;
+    
+    // Adjust the scale for better print fit
+    document.body.style.transform = "scale(0.9)";
+    document.body.style.transformOrigin = "top left";
+    
+    window.print();
+    document.body.innerHTML = originalContent; 
+}
 
-        /* Download Invoice as PDF */
-        function downloadInvoice() {
-            const element = document.querySelector('.invoice-container'); 
-            const options = {
-                margin: 0.5,
-                filename: 'invoice.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-            html2pdf().set(options).from(element).save();
-        }
+
+// function downloadInvoice() {
+//     const element = document.querySelector('.invoice-container');
+//     const options = {
+//         margin: [0.2, 0.2, 0.2, 0.2], // Reduced margins for better page utilization
+//         filename: 'invoice.pdf',
+//         image: { type: 'jpeg', quality: 0.98 },
+//         html2canvas: { 
+//             scale: 2, 
+//             useCORS: true // Fix potential rendering issues
+//         },
+//         jsPDF: { 
+//             unit: 'mm', 
+//             format: 'a4', 
+//             orientation: 'portrait' 
+//         },
+//         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // Ensures content splits correctly
+//     };
+
+//     html2pdf()
+//         .set(options)
+//         .from(element)
+//         .toPdf()
+//         .get('pdf')
+//         .then(function (pdf) {
+//             pdf.save('invoice.pdf');
+//         });
+// }
+
+
     </script>
 </head>
 
@@ -209,7 +275,7 @@
                     <tr>
                         <th>S.No</th>
                         <th>Product</th>
-                        <th>Quantity</th>
+                        <th>Qty</th>
                         <th>Price</th>
                         <th>Subtotal</th>
                     </tr>
@@ -234,7 +300,7 @@
     <!-- Buttons -->
     <div class="buttons">
         <button onclick="printInvoice()">Print Invoice</button>
-        <button onclick="downloadInvoice()">Download as PDF</button>
+        <!-- <button onclick="downloadInvoice()">Download as PDF</button> -->
     </div>
 
     <!-- Footer -->
