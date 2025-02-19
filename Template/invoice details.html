@@ -149,6 +149,8 @@
     body {
         font-size: 12px; /* Reduce global font size */
         margin: 10px;
+        -webkit-print-color-adjust: exact; /* Ensure colors print */
+        print-color-adjust: exact;
     }
 
     .invoice-container {
@@ -156,12 +158,25 @@
         font-size: 12px;
     }
 
+    /* Keep header in color */
+    .header {
+        background-color: #007BFF !important; /* Ensure blue background */
+        color: white !important;
+    }
+
     .header h1 {
         font-size: 20px;
+        color: white !important;
     }
 
     .header p {
         font-size: 12px;
+        color: white !important;
+    }
+
+    /* Convert everything except the header to black & white */
+    .content, .footer, table {
+        filter: grayscale(100%);
     }
 
     table {
@@ -171,19 +186,21 @@
     }
 
     th, td {
-        padding: 4px; /* Reduce padding */
-        border: 1px solid #ccc;
+        padding: 4px;
+        border: 1px solid black; /* Ensure table borders are visible */
     }
 
     th {
         font-size: 12px;
+        background: black !important; /* Black table header */
+        color: white !important;
     }
 
     td {
         font-size: 11px;
     }
 
-    /* Prevent table row from breaking between pages */
+    /* Prevent table rows from breaking between pages */
     tr {
         page-break-inside: avoid;
     }
@@ -201,6 +218,7 @@
         font-size: 10px;
     }
 }
+
 
     </style>
 

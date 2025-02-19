@@ -211,7 +211,50 @@
                 gap: 10px;
             }
         }
+        @media print {
+            body {
+                background-color: white;
+                color: black;
+                font-size: 12px; /* Reduce font size for paper efficiency */
+            }
+            .navbar, .btn-container, button {
+                display: none; /* Hide unnecessary elements */
+            }
+            .table-container {
+                width: 100%;
+                box-shadow: none;
+                padding: 0;
+                border: none;
+            }
+            table {
+                width: 100%;
+                font-size: 10px; /* Reduce table font size */
+                border-collapse: collapse;
+            }
+            th, td {
+                padding: 5px;
+                border: 1px solid black;
+            }
+        }
+        
     </style>
+    <script>
+        function printInvoice() {
+            // Hide unnecessary elements
+            let navbar = document.querySelector('.navbar');
+            let buttons = document.querySelectorAll('.btn-container, button');
+
+            navbar.style.display = 'none';
+            buttons.forEach(btn => btn.style.display = 'none');
+
+            // Trigger print
+            window.print();
+
+            // Restore visibility after printing
+            navbar.style.display = 'flex';
+            buttons.forEach(btn => btn.style.display = 'block');
+        }
+    </script>
 </head>
 <body>
     <nav class="navbar">
@@ -232,6 +275,7 @@
     </nav>
 
     <h1>Product List</h1>
+    <button onclick="printInvoice()">Print Stock list</button>
     <div class="table-container">
         <table>
             <tr>
