@@ -310,7 +310,8 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <p style="text-align: right;"><strong>Discount ({{ invoice.discount_percentage }}%)</strong></p>
+            <p style="text-align: right;"><strong>Total Boxes:({{  total_qty  }})</strong></p>
+            <p style="text-align: right;"><strong>Discount: ({{ invoice.discount_percentage }}%)</strong></p>
             <p style="text-align: right;"><strong>Total: ₹{{ invoice.total_amount }}</strong></p>
         </div>
     </div>
