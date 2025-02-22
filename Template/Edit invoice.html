@@ -274,10 +274,10 @@
         })
         .then(response => response.json())
         .then(data => {
-            console.log("Response from server:", data); // Debugging log
+            console.log("Response from server:", data); 
             if (data.success) {
                 alert("Invoice updated successfully!");
-                window.location.href = "{% url 'invoicelist' %}"; // Redirect after update
+                window.location.href = "{% url 'invoicelist' %}"; 
             } else {
                 alert("Error updating invoice: " + data.message);
             }
