@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Home</title>
+    <title>Admin home</title>
     <style>
         body {
             font-family: 'Roboto', Arial, sans-serif;
@@ -182,27 +182,30 @@
     <nav class="navbar">
         <h1>PayTrack</h1>
         <ul class="nav-links">
-            <li><a href="{% url 'userhome' %}">Home</a></li>
+            <li><a href="{% url 'adminhome' %}">Home</a></li>
             <li class="dropdown">
                 <a href="javascript:void(0)" onclick="toggleDropdown()">Manage</a>
                 <div class="dropdown-content" id="dropdownMenu">
-                    <a href="{% url 'invoicelist' %}">Invoice List</a>
-                    <a href="{% url 'productlist' %}">Stock List</a>
+                    <a href="{% url 'productionhistory' %}">Production History</a>
+                    <a href="{% url 'stock_edit' %}">Stock Edition</a>
+                    <a href="{% url 'salesreport' %}">Sales Report</a>
                 </div>
             </li>
             <li><a href="{% url 'logout' %}">Logout</a></li>
         </ul>
     </nav>
-
     <div class="container">
-        <h2>Welcome to PayTrack</h2>
-        <div class="button-container">
-            <a href="{% url 'productlist' %}" class="button">Stock List</a>
-            <a href="{% url 'addproduction' %}" class="button">Add Production</a>
-            <a href="{% url 'createinvoice' %}" class="button">Create Invoice</a>
-        </div>
-    </div>
-
+    <h1>Welcome to Admin</h1>
+    <div class="button-container">
+    <a href="{% url 'salesreport' %}" class="button">Sales Report</a>
+    <a href="{% url 'product_sales_report' %}" class="button">Product Report</a>
+    <a href="{% url 'addproduct' %}" class="button">Add Product </a>
+    <a href="{% url 'stock_edit' %}" class="button">Stock Edit </a>
+    <a href="{% url 'productionhistory' %}" class="button">Production History</a>
+    
+</div>
+</div>
+   
     <footer>
         © 2025 PayTrack. All rights reserved.
     </footer>
@@ -212,7 +215,6 @@
             const dropdownMenu = document.getElementById('dropdownMenu');
             dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
         }
-
         window.onclick = function(event) {
             if (!event.target.matches('.dropdown > a')) {
                 const dropdownMenu = document.getElementById('dropdownMenu');
@@ -221,6 +223,6 @@
                 }
             }
         };
-    </script>
+        </script>
 </body>
 </html>

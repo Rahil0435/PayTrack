@@ -34,6 +34,7 @@ urlpatterns = [
     path('form/', app.views.registration, name='form'),
     path('login/', app.views.Login, name='login'),
     path('userhome/', app.views.userhome, name='userhome'),
+    path('adminhome/', app.views.adminhome, name='adminhome'),
     path('addproduct/',app. views.add_product, name='addproduct'),
     path('addproduction/',app. views.add_production, name='addproduction'),
     path('productlist/',app.views.product_list, name='productlist'),
@@ -45,7 +46,8 @@ urlpatterns = [
     path('logout/',app.views.logoutview, name='logout'),
     path('invoice/<int:invoice_id>/pdf/',app.views.generate_pdf, name='generate_pdf'),
     path('invoice/delete/<int:invoice_id>/',app.views.delete_invoice, name='delete_invoice'),
-
-
+    path('salesreport/',app.views.sales_report, name='salesreport'),
+    path('product_sales_report/',app.views.product_sales_report, name='product_sales_report'),
+    path('stock_edit/',app.views.stock_edit, name='stock_edit'), 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -11,17 +11,18 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.template.loader import render_to_string
 from django.db.models import Max
-from django.utils import timezone
+from datetime import datetime
 import re
 from django.db import connection
 from django.http import HttpResponseNotAllowed
 from django.views.decorators.cache import never_cache
-from django.db.models import F
+from django.utils.timezone import now
+from django.db.models import Sum,F
 
 
 
 # Create your views here.
-@never_cache
+
 def Home(request):
     template = loader.get_template("base.html")
     context = {}
@@ -204,6 +205,9 @@ def Login(request):
             if l.utype == "user":
                 request.session["uid"] = l.uid_id
                 return HttpResponse("<script>alert('Welcome User');window.location='/userhome';</script>")
+            elif l.utype == "admin":
+                request.session["uid"] = l.uid_id
+                return HttpResponse("<script>alert('Welcome Admin');window.location='/adminhome';</script>")
 
         except login.DoesNotExist:
             return HttpResponse("<script>alert('Invalid username or password.');window.location='/login';</script>")
@@ -231,6 +235,7 @@ def registration(request):
     context = {}
     return HttpResponse(template.render(context, request))
 
+@never_cache
 def userhome(request):
     template = loader.get_template("userhome.html")
     context = {}
@@ -291,3 +296,88 @@ def delete_invoice(request, invoice_id):
         return HttpResponse("<script>alert('Invoice deleted successfully! Product stock has been updated.');window.location='/invoicelist';</script>")
 
     return HttpResponseNotAllowed(['POST']) 
+
+
+def adminhome(request):
+    template = loader.get_template("adminhome.html")
+    context = {}
+    return HttpResponse(template.render(context, request))
+
+def sales_report(request):
+    invoices = Invoice.objects.all()
+    today = now().date()
+    start_date = request.GET.get('start_date', today)
+    end_date = request.GET.get('end_date', today)
+
+    # Apply filtering if both dates are provided
+    if start_date and end_date:
+        invoices = invoices.filter(date__range=[start_date, end_date])
+
+    # Calculate total sales
+    total_sales = sum(invoice.total_amount for invoice in invoices)
+
+    context = {
+        'invoices': invoices,
+        'total_sales': total_sales,
+        'start_date': start_date,
+        'end_date': end_date,
+    }
+    return render(request, 'sales_report.html', context)
+
+def product_sales_report(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    if not start_date:
+        start_date = datetime.today().date()
+    else:
+        try:
+            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+        except ValueError:
+            return render(request, "product_sales_report.html", {"error": "Invalid start date format"})
+
+    if not end_date:
+        end_date = datetime.today().date()
+    else:
+        try:
+            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+        except ValueError:
+            return render(request, "product_sales_report.html", {"error": "Invalid end date format"})
+    sales_data = (
+        InvoiceItem.objects
+        .filter(invoice__date__range=[start_date, end_date]) 
+        .values('product__name') 
+        .annotate(
+            total_quantity=Sum('quantity'),
+            total_sales=Sum('subtotal')  
+        )
+        .order_by('-total_quantity')
+    )
+    return render(request, "product_sales_report.html", {
+        "sales_data": sales_data,
+        "start_date": start_date,
+        "end_date": end_date
+    })
+
+def stock_edit(request):
+    """View to display and edit stock list by the admin"""
+    products = Product.objects.all()
+
+    if request.method == "POST":
+        for product in products:
+            field_name = f'quantity_{product.id}'
+            if field_name in request.POST:
+                new_quantity = request.POST[field_name]
+                try:
+                    new_quantity = int(new_quantity)
+                    if new_quantity >= 0:
+                        product.quantity = new_quantity
+                        product.save()
+                    else:
+                        messages.error(request, f"Invalid quantity for {product.name}")
+                except ValueError:
+                    messages.error(request, f"Invalid input for {product.name}")
+
+        messages.success(request, "Stock updated successfully!")
+        return redirect('stock_edit')  # Redirect to avoid resubmission
+
+    return render(request, 'stock_edit.html', {'products': products})

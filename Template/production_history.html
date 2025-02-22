@@ -128,10 +128,82 @@
                 padding: 6px 10px;
             }
         }
+        .navbar {
+            background-color: #0056b3;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-links li {
+            position: relative;
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 35px;
+            left: 0;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .dropdown-content a {
+            display: block;
+            padding: 10px 15px;
+            color: #0056b3;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f4f6f9;
+        }
     </style>
 </head>
 <body>
-    <button><a href="{% url 'userhome' %}"><-- Home</a></button>
+    <nav class="navbar">
+        <h1>PayTrack</h1>
+        <ul class="nav-links">
+            <li><a href="{% url 'adminhome' %}">Home</a></li>
+            <li class="dropdown">
+                <a href="javascript:void(0)" onclick="toggleDropdown()">Manage</a>
+                <div class="dropdown-content" id="dropdownMenu">
+                    <a href="{% url 'productionhistory' %}">Production History</a>
+                    <a href="{% url 'stock_edit' %}">Stock Edition</a>
+                    <a href="{% url 'salesreport' %}">Sales Report</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
     <div class="container">
         <h1>Production History</h1>
         <table>
@@ -160,4 +232,18 @@
         </table>
     </div>
 </body>
+<script>
+    function toggleDropdown() {
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+    }
+    window.onclick = function(event) {
+        if (!event.target.matches('.dropdown > a')) {
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            if (dropdownMenu && dropdownMenu.style.display === 'block') {
+                dropdownMenu.style.display = 'none';
+            }
+        }
+    };
+    </script>
 </html>
