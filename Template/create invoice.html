@@ -189,6 +189,15 @@
         .alert button:hover {
             opacity: 0.7;
         }
+        #bn{
+            background-color: #007BFF;
+            width: 160px;
+            height: 35px;
+        }
+        a{
+            color: white;
+            text-decoration: none;
+        }
     </style>
     <script>
         function addRow() {
@@ -261,7 +270,7 @@
 </head>
 
 <body>
-    <button><a href="{% url 'userhome' %}"> Home</a></button>
+    <button id="bn"><a href="{% url 'userhome' %}"> Home</a></button>
     <div class="container">
 
         {% if messages %}

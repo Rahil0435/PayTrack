@@ -147,13 +147,13 @@
     <nav class="navbar">
         <h1>PayTrack</h1>
         <ul class="nav-links">
-            <li><a href="{% url 'adminhome' %}">Home</a></li>
+            <li><a href="{% url 'userhome' %}">Home</a></li>
             <li class="dropdown">
                 <a href="javascript:void(0)" onclick="toggleDropdown()">Manage</a>
                 <div class="dropdown-content" id="dropdownMenu">
-                    <a href="{% url 'productionhistory' %}">Production History</a>
-                    <a href="{% url 'stock_edit' %}">Stock Edition</a>
-                    <a href="{% url 'salesreport' %}">Sales Report</a>
+                    <a href="{% url 'addproduction' %}">Add Production</a>
+                    <a href="{% url 'invoicelist' %}">Invoice List</a>
+                    <a href="{% url 'productlist' %}">Stock List</a>
                 </div>
             </li>
         </ul>

@@ -381,3 +381,108 @@ def stock_edit(request):
         return redirect('stock_edit')  # Redirect to avoid resubmission
 
     return render(request, 'stock_edit.html', {'products': products})
+
+import json
+from decimal import Decimal
+
+def decimal_to_float(obj):
+    if isinstance(obj, Decimal):
+        return float(obj)
+    raise TypeError
+
+def edit_invoice(request, invoice_id):
+    invoice = get_object_or_404(Invoice, id=invoice_id)
+
+    if request.method == "POST":
+        try:
+            customer = request.POST.get("customer", invoice.customer)
+            date = request.POST.get("date", invoice.date)
+            discount_percentage = request.POST.get("discount_percentage", invoice.discount_percentage)
+
+            # Convert discount percentage to Decimal
+            discount_percentage = Decimal(discount_percentage) if discount_percentage else Decimal(0)
+
+            product_ids = request.POST.getlist("products[]")
+            quantities = request.POST.getlist("quantities[]")
+
+            if not product_ids or not quantities:
+                return JsonResponse({"success": False, "message": "Products and quantities are required."})
+
+            if len(product_ids) != len(quantities):
+                return JsonResponse({"success": False, "message": "Mismatched product and quantity count."})
+
+            # Restore stock before deleting old invoice items
+            for item in invoice.invoice_items.all():
+                item.product.quantity += item.quantity
+                item.product.save()
+
+            # Clear existing invoice items
+            invoice.invoice_items.all().delete()
+
+            # Calculate total amount before discount
+            total_amount = Decimal(0)
+            for product_id, quantity in zip(product_ids, quantities):
+                product = get_object_or_404(Product, id=product_id)
+                quantity = int(quantity)
+                price = product.price  # Assuming price is stored as Decimal in the Product model
+                subtotal = price * quantity
+                total_amount += subtotal
+
+                # Ensure stock is available
+                if product.quantity < quantity:
+                    return JsonResponse({"success": False, "message": f"Not enough stock for {product.name}."})
+
+                # Deduct the new quantity from stock
+                product.quantity -= quantity
+                product.save()
+
+                InvoiceItem.objects.create(
+                    invoice=invoice,
+                    product=product,
+                    quantity=quantity,
+                    price=price,
+                    subtotal=subtotal,
+                )
+
+            # Apply discount correctly
+            discount_amount = (total_amount * discount_percentage) / Decimal(100)
+            final_total = total_amount - discount_amount  # Save discounted total
+
+            # Update invoice details
+            invoice.customer = customer
+            invoice.date = date
+            invoice.discount_percentage = discount_percentage
+            invoice.total_amount = final_total  # Save the correct discounted total
+            invoice.save()
+
+            return HttpResponse("<script>alert('Invoice Updated successfully!');window.location='/invoicelist';</script>")
+
+        except ValueError:
+            return JsonResponse({"success": False, "message": "Invalid number format."})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)})
+
+    invoice_items = invoice.invoice_items.all()
+    products = Product.objects.all()
+
+    invoice_data = {
+        "id": invoice.id,
+        "customer": str(invoice.customer),
+        "date": invoice.date.strftime("%Y-%m-%d"),
+        "discount": float(invoice.discount_percentage) if invoice.discount_percentage else 0.0,
+        "total": float(invoice.total_amount) if invoice.total_amount else 0.0,
+        "items": [
+            {
+                "product_id": item.product.id,
+                "quantity": item.quantity,
+                "price": float(item.price),
+                "subtotal": float(item.subtotal),
+            } for item in invoice_items
+        ]
+    }
+
+    return render(request, 'Edit invoice.html', {
+        'invoice': invoice,
+        'invoice_json': json.dumps(invoice_data),
+        'products': products
+    })

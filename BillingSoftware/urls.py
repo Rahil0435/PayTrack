@@ -49,5 +49,6 @@ urlpatterns = [
     path('salesreport/',app.views.sales_report, name='salesreport'),
     path('product_sales_report/',app.views.product_sales_report, name='product_sales_report'),
     path('stock_edit/',app.views.stock_edit, name='stock_edit'), 
+    path('editinvoice/<int:invoice_id>/',app.views.edit_invoice, name='editinvoice'), 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
