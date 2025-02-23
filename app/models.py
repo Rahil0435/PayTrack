@@ -35,6 +35,8 @@ class Invoice(models.Model):
     invoice_number = models.CharField(max_length=20, unique=True, blank=True)  # Allow blank to generate in save()
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    accessory_required = models.BooleanField(default=False)
+    accessory_quantity = models.IntegerField(default=0)
 
     def final_amount(self):
         discount_amount = (self.total_amount * self.discount_percentage) / 100  # Calculate discount
@@ -59,6 +61,7 @@ class InvoiceItem(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='invoice_items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
+    accessory_name = models.CharField(max_length=100, null=True, blank=True) 
     price = models.DecimalField(max_digits=10, decimal_places=2)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Add default value
  

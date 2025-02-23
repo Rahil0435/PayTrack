@@ -94,7 +94,8 @@ def get_stock(request, product_id):
     except Product.DoesNotExist:
         return JsonResponse({'error': 'Product not found'}, status=404)
     
-def createinvoice(request):  # Updated function name to match your path
+
+def createinvoice(request):  
     invoice_form = InvoiceForm(request.POST or None)
 
     if request.method == 'POST':
@@ -102,73 +103,98 @@ def createinvoice(request):  # Updated function name to match your path
             try:
                 with transaction.atomic():
                     invoice = invoice_form.save(commit=False)
-                    invoice.invoice_number = ""
+                    invoice.invoice_number = ""  # Temporary invoice number, updated later
                     invoice.save()
 
                     products = request.POST.getlist('products[]')
                     quantities = request.POST.getlist('quantities[]')
+                    accessory_names = request.POST.getlist('accessory_name[]')
+                    accessory_prices = request.POST.getlist('accessory_price[]')
 
-                    if not products or not quantities or len(products) != len(quantities):
-                        messages.error(request, "Please select at least one product.")
-                        return redirect('createinvoice')  # Redirect back if no valid items
+                    if not (products or accessory_names):  # Ensure at least one item
+                        messages.error(request, "Please add at least one product or accessory.")
+                        return redirect('createinvoice')
 
                     total_amount = 0
-                    valid_items = []
+                    valid_items = 0  # Track valid items
 
+                    # Process products from the database
                     for i in range(len(products)):
-                        product = get_object_or_404(Product, id=products[i])
-                        quantity = int(quantities[i])
+                        try:
+                            product = get_object_or_404(Product, id=products[i])
+                            quantity = int(quantities[i])
 
-                        if product.quantity >= quantity:  # Automatically skip out-of-stock items
-                            price = product.price
-                            subtotal = price * quantity
-                            total_amount += subtotal
+                            if product.quantity >= quantity and quantity > 0:
+                                price = product.price
+                                subtotal = price * quantity
+                                total_amount += subtotal
 
-                            # Store valid items
-                            valid_items.append({
-                                'invoice': invoice,
-                                'product': product,
-                                'quantity': quantity,
-                                'price': price,
-                                'subtotal': subtotal
-                            })
+                                InvoiceItem.objects.create(
+                                    invoice=invoice,
+                                    product=product,
+                                    quantity=quantity,
+                                    price=price,
+                                    subtotal=subtotal
+                                )
+                                product.quantity -= quantity  # Reduce stock
+                                product.save()
+                                valid_items += 1
+                            else:
+                                messages.warning(request, f"Not enough stock for {product.name}. Skipped.")
 
-                    if valid_items:
-                        # Save valid invoice items
-                        for item in valid_items:
-                            InvoiceItem.objects.create(**item)
-                            item['product'].quantity -= item['quantity']
-                            item['product'].save()
+                        except (ValueError, Product.DoesNotExist):
+                            messages.error(request, "Invalid product selection.")
+                            return redirect('createinvoice')
 
-                        # Apply discount
-                        discount_percentage = invoice.discount_percentage or 0
-                        discount_amount = (total_amount * discount_percentage) / 100
-                        final_amount = max(total_amount - discount_amount, 0)
+                    # Process manual accessories
+                    for j in range(len(accessory_names)):
+                        accessory_name = accessory_names[j].strip()
+                        try:
+                            accessory_price = float(accessory_prices[j])
 
-                        # Save final total amount
-                        invoice.total_amount = final_amount
-                        invoice.save()
+                            if accessory_name and accessory_price > 0:
+                                InvoiceItem.objects.create(
+                                    invoice=invoice,
+                                    product=None,  
+                                    quantity=1,
+                                    price=accessory_price,
+                                    subtotal=accessory_price
+                                )
+                                total_amount += accessory_price
+                                valid_items += 1
 
-                        messages.success(request, f"Invoice {invoice.invoice_number} created successfully! Skipped out-of-stock items.")
-                        return redirect('invoicelist')
+                        except ValueError:
+                            messages.error(request, "Invalid accessory price entered.")
+                            return redirect('createinvoice')
 
-                    else:
-                        invoice.delete()  # No valid items, delete empty invoice
-                        messages.error(request, "No products available to create an invoice.")
+                    if valid_items == 0:
+                        invoice.delete()  # No valid items, remove invoice
+                        messages.error(request, "No valid items to create an invoice.")
+                        return redirect('createinvoice')
+
+                    # Apply discount
+                    discount_percentage = invoice.discount_percentage or 0
+                    discount_amount = (total_amount * discount_percentage) / 100
+                    final_amount = max(total_amount - discount_amount, 0)
+
+                    invoice.total_amount = final_amount
+                    invoice.save()
+
+                    messages.success(request, f"Invoice {invoice.invoice_number} created successfully!")
+                    return redirect('invoicelist')
 
             except IntegrityError:
                 messages.error(request, "Invoice creation failed due to a system error. Please try again.")
             except Exception as e:
                 messages.error(request, f"An unexpected error occurred: {e}")
 
-        else:
-            messages.error(request, "Form validation failed. Please check your inputs.")
-
     products = Product.objects.all()
-    return render(request, 'create invoice.html', {  # Uses your template name
+    return render(request, 'create invoice.html', {  
         'invoice_form': invoice_form,
         'products': products,
     })
+
+
 
 
 def invoice_list(request):
@@ -347,8 +373,7 @@ def product_sales_report(request):
         .filter(invoice__date__range=[start_date, end_date]) 
         .values('product__name') 
         .annotate(
-            total_quantity=Sum('quantity'),
-            total_sales=Sum('subtotal')  
+            total_quantity=Sum('quantity'), 
         )
         .order_by('-total_quantity')
     )
@@ -390,6 +415,7 @@ def decimal_to_float(obj):
         return float(obj)
     raise TypeError
 
+
 def edit_invoice(request, invoice_id):
     invoice = get_object_or_404(Invoice, id=invoice_id)
 
@@ -419,18 +445,20 @@ def edit_invoice(request, invoice_id):
             # Clear existing invoice items
             invoice.invoice_items.all().delete()
 
-            # Calculate total amount before discount
+            # Process new items
             total_amount = Decimal(0)
+            skipped_items = []
             for product_id, quantity in zip(product_ids, quantities):
                 product = get_object_or_404(Product, id=product_id)
                 quantity = int(quantity)
+
+                if product.quantity < quantity:
+                    skipped_items.append(product.name)
+                    continue  # Skip this product and continue with the rest
+
                 price = product.price  # Assuming price is stored as Decimal in the Product model
                 subtotal = price * quantity
                 total_amount += subtotal
-
-                # Ensure stock is available
-                if product.quantity < quantity:
-                    return JsonResponse({"success": False, "message": f"Not enough stock for {product.name}."})
 
                 # Deduct the new quantity from stock
                 product.quantity -= quantity
@@ -455,7 +483,11 @@ def edit_invoice(request, invoice_id):
             invoice.total_amount = final_total  # Save the correct discounted total
             invoice.save()
 
-            return HttpResponse("<script>alert('Invoice Updated successfully!');window.location='/invoicelist';</script>")
+            if skipped_items:
+                skipped_message = f"Invoice updated, items skipped due to insufficient stock: {', '.join(skipped_items)}"
+                return HttpResponse(f"<script>alert('{skipped_message}');window.location='/invoicelist';</script>")
+            else:
+                return HttpResponse("<script>alert('Invoice Updated successfully!');window.location='/invoicelist';</script>")
 
         except ValueError:
             return JsonResponse({"success": False, "message": "Invalid number format."})

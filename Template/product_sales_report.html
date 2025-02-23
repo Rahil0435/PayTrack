@@ -78,7 +78,6 @@
                 <th>S.No</th>
                 <th>Product Name</th>
                 <th>Total Quantity Sold</th>
-                <th>Total Sales (₹)</th>
             </tr>
         </thead>
         <tbody>
@@ -87,7 +86,6 @@
                 <td>{{forloop.counter}}</td>
                 <td>{{ data.product__name }}</td>
                 <td>{{ data.total_quantity }}</td>
-                <td>₹{{ data.total_sales }}</td>
             </tr>
             {% empty %}
             <tr>

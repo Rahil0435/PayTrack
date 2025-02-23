@@ -689,3 +689,294 @@ Traceback (most recent call last):
     )
 django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ' if product.id == productId else ''' from ''selected' if product.id == productId else '''
 "GET /editinvoice/92/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 171, in createinvoice
+    return render(request, 'create invoice.html', {
+        'invoice_form': invoice_form,
+        'products': products,
+    })
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: create_invoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 171, in createinvoice
+    return render(request, 'create invoice.html', {
+        'invoice_form': invoice_form,
+        'products': products,
+    })
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: create_invoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 171, in createinvoice
+    return render(request, 'create invoice.html', {
+        'invoice_form': invoice_form,
+        'products': products,
+    })
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: create_invoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 192, in createinvoice
+    return render(request, 'create invoice.html', {
+        'invoice_form': invoice_form,
+        'products': products,
+    })
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: create_invoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 192, in createinvoice
+    return render(request, 'create invoice.html', {
+        'invoice_form': invoice_form,
+        'products': products,
+    })
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: create_invoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 189, in createinvoice
+    return render(request, 'create invoice.html', {
+        'invoice_form': invoice_form,
+        'products': products,
+    })
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: create_invoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 189, in createinvoice
+    return render(request, 'create invoice.html', {
+        'invoice_form': invoice_form,
+        'products': products,
+    })
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: create_invoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 189, in createinvoice
+    return render(request, 'create invoice.html', {
+        'invoice_form': invoice_form,
+        'products': products,
+    })
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: create_invoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 189, in createinvoice
+    return render(request, 'create invoice.html', {
+        'invoice_form': invoice_form,
+        'products': products,
+    })
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: create_invoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 189, in createinvoice
+                messages.error(request, f"An unexpected error occurred: {e}")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    return render(request, 'create invoice.html', {
+    ^^
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: createinvoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 189, in createinvoice
+                messages.error(request, f"An unexpected error occurred: {e}")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    return render(request, 'create invoice.html', {
+    ^^
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: createinvoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 189, in createinvoice
+                messages.error(request, f"An unexpected error occurred: {e}")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    return render(request, 'create invoice.html', {
+    ^^
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: createinvoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 189, in createinvoice
+                messages.error(request, f"An unexpected error occurred: {e}")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    return render(request, 'create invoice.html', {
+    ^^
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: createinvoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 189, in createinvoice
+                messages.error(request, f"An unexpected error occurred: {e}")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    return render(request, 'create invoice.html', {
+    ^^
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: createinvoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
+Internal Server Error: /createinvoice/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 189, in createinvoice
+                messages.error(request, f"An unexpected error occurred: {e}")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    return render(request, 'create invoice.html', {
+    ^^
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: createinvoice.html
+"GET /createinvoice/ HTTP/1.1" 500 145
