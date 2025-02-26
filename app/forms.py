@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product,Production,Invoice, InvoiceItem
+from .models import Product,Production,Invoice, InvoiceItem,Factorysale
 from django.utils import timezone
 from datetime import timezone
 
@@ -65,3 +65,10 @@ class InvoiceWithItemsForm(forms.Form):
 
         return cleaned_data
 
+class FactorySaleForm(forms.ModelForm):
+    class Meta:
+        model = Factorysale
+        fields = ['flavor', 'quantity', 'total_amount']
+        widgets = {
+         'quantity': forms.NumberInput(attrs={'min': 1, 'class': 'quantity-input'}),
+     }

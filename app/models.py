@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from datetime import date
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
@@ -78,3 +79,12 @@ class login(models.Model):
     pswd = models.CharField(max_length=128)  
     utype = models.CharField(max_length=20)
     uid = models.ForeignKey(reg, on_delete=models.CASCADE)
+
+class Factorysale(models.Model):
+    date = models.DateField(default=date.today)  # Auto-set to today's date
+    flavor = models.CharField(max_length=100)  # Flavor name
+    quantity = models.PositiveIntegerField()  # Quantity sold
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)  # Total price
+
+    def __str__(self):
+        return f"{self.flavor} - {self.quantity} sold on {self.date}"

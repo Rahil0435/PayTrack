@@ -13,7 +13,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: auto;
             background: white;
             padding: 20px;
@@ -72,11 +72,13 @@
             font-size: 18px;
             font-weight: bold;
         }
-        a{
+
+        a {
             color: white;
             text-decoration: none;
         }
-        #bn{
+
+        #bn {
             background-color: #007BFF;
             width: 160px;
             height: 35px;
@@ -101,6 +103,8 @@
             </form>
         </div>
 
+        <!-- Invoice Sales Table -->
+        <h3>Invoice Sales</h3>
         <table>
             <thead>
                 <tr>
@@ -110,7 +114,6 @@
                     <th>Customer</th>
                     <th>Discount (%)</th>
                     <th>Total (₹)</th>
-                    
                 </tr>
             </thead>
             <tbody>
@@ -125,13 +128,45 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6">No sales found for the selected date range.</td>
+                    <td colspan="6">No invoice sales found for the selected date range.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <p class="total-sales">Total Sales: ₹{{ total_sales }}</p>
+        <!-- Factory Sales Table -->
+        <h3>Factory Sales</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Date</th>
+                    <th>Flavor</th>
+                    <th>Quantity</th>
+                    <th>Total (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for factory_sale in factory_sales %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ factory_sale.date }}</td>
+                    <td>{{ factory_sale.flavor }}</td>
+                    <td>{{ factory_sale.quantity }}</td>
+                    <td>₹{{ factory_sale.total_amount }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No factory sales found for the selected date range.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Total Sales -->
+        <p class="total-sales">Total Invoice Sales: ₹{{ total_invoice_sales }}</p>
+        <p class="total-sales">Total Factory Sales: ₹{{ total_factory_sales }}</p>
+        <p class="total-sales">Overall Total Sales: ₹{{ total_sales }}</p>
     </div>
 
 </body>

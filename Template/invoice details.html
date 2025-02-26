@@ -147,12 +147,12 @@
 
         @media print {
     @page {
-        size: A4 portrait; /* A4 size */
-        margin: 12mm; /* Balanced margin for better layout */
+        size: A4 portrait; /* Keep A4 format */
+        margin: 10mm; /* Adjust margin for space */
     }
 
     body {
-        font-size: 13px; /* Slightly larger for better readability */
+        font-size: 10px; /* Reduce text size for more space */
         margin: 0;
         padding: 0;
         -webkit-print-color-adjust: exact;
@@ -161,65 +161,45 @@
 
     .invoice-container {
         width: 100%;
-        font-size: 12px;
-        padding: 10mm;
-    }
-
-    /* Keep header in color */
-    .header {
-        background-color: #007BFF !important;
-        color: white !important;
-        padding: 10px 0;
-    }
-
-    .header h1 {
-        font-size: 20px; /* More visible title */
-        margin: 0;
-    }
-
-    .header p {
-        font-size: 12px;
-        margin: 3px 0;
-    }
-
-    /* Convert everything except the header to grayscale */
-    .content, .footer, table {
-        filter: grayscale(100%);
+        font-size: 10px; /* Adjust font for table */
+        padding: 5mm;
     }
 
     table {
-        font-size: 12px; /* Optimized table font */
+        font-size: 10px; /* Reduce table font */
         border-collapse: collapse;
         width: 100%;
     }
 
     th, td {
-        padding: 5px; /* Better spacing for clarity */
+        padding: 4px; /* Reduce cell padding */
         border: 1px solid black;
     }
 
     th {
-        font-size: 12px;
+        font-size: 10px; /* Reduce header font */
         background: black !important;
         color: white !important;
     }
 
     td {
-        font-size: 11px;
+        font-size: 9px; /* Reduce body font */
     }
 
-    /* Prevent table rows from breaking between pages */
+    /* Adjust row height */
     tr {
+        height: auto;
+        line-height: 1; /* Compact rows */
         page-break-inside: avoid;
     }
 
-    /* Hide buttons while printing */
+    /* Hide buttons during print */
     .buttons {
         display: none;
     }
 
     .footer {
-        font-size: 10px;
+        font-size: 9px;
     }
 }
 
@@ -228,17 +208,20 @@
     <script>
         /* Print Invoice */
         function printInvoice() {
-    const printContent = document.querySelector('.invoice-container'); 
-    const originalContent = document.body.innerHTML; 
+    const printContent = document.querySelector('.invoice-container');
+    const originalContent = document.body.innerHTML;
 
-    document.body.innerHTML = printContent.innerHTML;
-    
-    // Adjust the scale for better print fit
-    document.body.style.transform = "scale(0.9)";
-    document.body.style.transformOrigin = "top left";
-    
+    // Apply styles for better fit
+    printContent.style.width = "80%"; // Reduce width for A4 fit
+    printContent.style.margin = "0 auto"; // Center align
+    printContent.style.fontSize = "12px"; // Adjust font size for readability
+
+    document.body.innerHTML = printContent.outerHTML;
+
     window.print();
-    document.body.innerHTML = originalContent; 
+
+    // Restore original content
+    document.body.innerHTML = originalContent;
 }
 
 

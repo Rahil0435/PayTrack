@@ -184,6 +184,7 @@
                 <tr>
                     <th>Invoice Number</th>
                     <th>Date</th>
+                    <th>Customer</th>
                     <th>Total Amount</th>
                     <th>Actions</th>
                 </tr>
@@ -193,6 +194,7 @@
                 <tr>
                     <td>{{ invoice.invoice_number }}</td>
                     <td>{{ invoice.date }}</td>
+                    <td>{{invoice.customer}}</td>
                     <td>₹{{ invoice.total_amount }}</td>
                     <td>
                         <a href="{% url 'invoice_detail' invoice.id %}">View</a> |

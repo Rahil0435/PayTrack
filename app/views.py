@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.http import HttpResponse, JsonResponse
-from .models import Product, Production, ProductionHistory, Invoice, InvoiceItem, reg, login
-from .forms import ProductionForm, ProductForm, InvoiceForm
+from .models import Product, Production, ProductionHistory, Invoice, InvoiceItem, reg, login,Factorysale
+from .forms import ProductionForm, ProductForm, InvoiceForm,FactorySaleForm
 from django.db import transaction,IntegrityError
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -331,6 +331,7 @@ def adminhome(request):
 
 def sales_report(request):
     invoices = Invoice.objects.all()
+    factory_sales = Factorysale.objects.all()
     today = now().date()
     start_date = request.GET.get('start_date', today)
     end_date = request.GET.get('end_date', today)
@@ -338,12 +339,20 @@ def sales_report(request):
     # Apply filtering if both dates are provided
     if start_date and end_date:
         invoices = invoices.filter(date__range=[start_date, end_date])
+        factory_sales = factory_sales.filter(date__range=[start_date, end_date])
 
-    # Calculate total sales
-    total_sales = sum(invoice.total_amount for invoice in invoices)
+    # Calculate total sales from both Invoice and Factorysale tables
+    total_invoice_sales = sum(invoice.total_amount for invoice in invoices)
+    total_factory_sales = sum(factory_sale.total_amount for factory_sale in factory_sales)
+
+    # Overall total sales
+    total_sales = total_invoice_sales + total_factory_sales
 
     context = {
         'invoices': invoices,
+        'factory_sales': factory_sales,
+        'total_invoice_sales': total_invoice_sales,
+        'total_factory_sales': total_factory_sales,
         'total_sales': total_sales,
         'start_date': start_date,
         'end_date': end_date,
@@ -518,3 +527,28 @@ def edit_invoice(request, invoice_id):
         'invoice_json': json.dumps(invoice_data),
         'products': products
     })
+
+def create_factory_sale(request):
+    if request.method == 'POST':
+        form = FactorySaleForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Factory Sale added successfully!")
+            return redirect('factorysalelist')  
+        else:
+            messages.error(request, "Error in form submission.")
+
+    else:
+        form = FactorySaleForm()
+
+    return render(request, 'create_factory_sale.html', {'form': form})
+
+def factory_sale_list(request):
+    sales = Factorysale.objects.all().order_by('-date')
+    return render(request, 'factory_sale_list.html', {'sales': sales})
+
+def delete_factory_sale(request, sale_id):
+    sale = get_object_or_404(Factorysale, id=sale_id)
+    sale.delete()
+    messages.success(request, "Factory Sale deleted successfully!")
+    return redirect('factorysalelist')

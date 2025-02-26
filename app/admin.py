@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Invoice,reg,ProductionHistory,Product,InvoiceItem,login,Production
+from .models import Invoice,reg,ProductionHistory,Product,InvoiceItem,login,Production,Factorysale
 
 # Register your models here.
     
@@ -28,3 +28,7 @@ class InvoiceitemAdmin(admin.ModelAdmin):
 @admin.register(ProductionHistory)
 class productionhitoryAdmin(admin.ModelAdmin):
     list_display=('product', 'quantity_produced','date')
+
+@admin.register(Factorysale)
+class FactorysaleAdmin(admin.ModelAdmin):
+    list_display=('flavor', 'quantity', 'total_amount','date')

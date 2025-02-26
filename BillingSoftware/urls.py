@@ -50,5 +50,8 @@ urlpatterns = [
     path('product_sales_report/',app.views.product_sales_report, name='product_sales_report'),
     path('stock_edit/',app.views.stock_edit, name='stock_edit'), 
     path('editinvoice/<int:invoice_id>/',app.views.edit_invoice, name='editinvoice'), 
+    path('factorysale/',app.views.create_factory_sale, name='factorysale'),
+    path('factorysalelist/',app.views.factory_sale_list, name='factorysalelist'),
+    path('factorysale/delete/<int:sale_id>/',app.views.delete_factory_sale, name='delete_factory_sale'),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
