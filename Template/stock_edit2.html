@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Update</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e8eff6;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #0056b3;
+        }
+        form {
+            display: inline-block;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #0056b3;
+            color: white;
+        }
+        input[type="number"] {
+            width: 80px;
+            padding: 5px;
+            text-align: center;
+        }
+        .btn-container {
+            margin-top: 10px;
+        }
+        button {
+            background-color: #0056b3;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #003d80;
+        }
+        .navbar {
+            background-color: #0056b3;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-links li {
+            position: relative;
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #cce4ff;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 35px;
+            left: 0;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .dropdown-content a {
+            display: block;
+            padding: 10px 15px;
+            color: #0056b3;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f4f6f9;
+        }
+    </style>
+    <script>
+        function confirmUpdate(event) {
+            event.preventDefault();  // Stop form submission
+            let confirmation = confirm("Are you sure you want to update the stock?");
+            if (confirmation) {
+                event.target.closest("form").submit();  // If confirmed, submit the form
+            }
+        }
+        function toggleDropdown() {
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        }
+        window.onclick = function(event) {
+            if (!event.target.matches('.dropdown > a')) {
+                const dropdownMenu = document.getElementById('dropdownMenu');
+                if (dropdownMenu && dropdownMenu.style.display === 'block') {
+                    dropdownMenu.style.display = 'none';
+                }
+            }
+        };
+       
+    </script>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>PayTrack</h1>
+        <ul class="nav-links">
+            <li><a href="{% url 'userhome2' %}">Home</a></li>
+            <li class="dropdown">
+                <a href="javascript:void(0)" onclick="toggleDropdown()">Manage</a>
+                <div class="dropdown-content" id="dropdownMenu">
+                    <a href="{% url 'addproduction2' %}">Add Production</a>
+                    <a href="{% url 'invoicelist2' %}">Invoice List</a>
+                    <a href="{% url 'productlist2' %}">Stock List</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <h1>Stock Updating</h1>
+    <form method="post">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <th>S.No</th>
+                <th>Product</th>
+                <th>Current Stock</th>
+                <th>New Quantity</th>
+            </tr>
+            {% for product in products %}
+            <tr>
+                <td>{{forloop.counter}}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.quantity }}</td>
+                <td><input type="number" name="quantity_{{ product.id }}" value="{{ product.quantity }}"></td>
+            </tr>
+            {% endfor %}
+        </table>
+        <div class="btn-container">
+            <button type="submit" onclick="confirmUpdate(event)">Update Stock</button>
+        </div>
+    </form>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Total Sales Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #007BFF;
+        }
+
+        .filters {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="date"], button {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        .total-sales {
+            margin-top: 20px;
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        a {
+            color: white;
+            text-decoration: none;
+        }
+
+        #bn {
+            background-color: #007BFF;
+            width: 160px;
+            height: 35px;
+        }
+    </style>
+</head>
+<body>
+    <button id="bn"><a href="{% url 'adminhome2' %}">Home</a></button>
+    <div class="container">
+        <h2>Total Sales Report</h2>
+
+        <!-- Filter Form -->
+        <div class="filters">
+            <form method="GET">
+                <label>Start Date:</label>
+                <input type="date" name="start_date" value="{{ start_date }}" required>
+                
+                <label>End Date:</label>
+                <input type="date" name="end_date" value="{{ end_date }}" required>
+                
+                <button type="submit">Filter</button>
+            </form>
+        </div>
+
+        <!-- Invoice Sales Table -->
+        <h3>Invoice Sales</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Invoice No</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Discount (%)</th>
+                    <th>Total (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ invoice.invoice_number }}</td>
+                    <td>{{ invoice.date }}</td>
+                    <td>{{ invoice.customer }}</td>
+                    <td>{{ invoice.discount_percentage }}%</td>
+                    <td>₹{{ invoice.total_amount }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">No invoice sales found for the selected date range.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Factory Sales Table -->
+        <h3>Factory Sales</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Date</th>
+                    <th>Flavor</th>
+                    <th>Quantity</th>
+                    <th>Total (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for factory_sale in factory_sales %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ factory_sale.date }}</td>
+                    <td>{{ factory_sale.flavor }}</td>
+                    <td>{{ factory_sale.quantity }}</td>
+                    <td>₹{{ factory_sale.total_amount }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No factory sales found for the selected date range.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Total Sales -->
+        <p class="total-sales">Total Invoice Sales: ₹{{ total_invoice_sales }}</p>
+        <p class="total-sales">Total Factory Sales: ₹{{ total_factory_sales }}</p>
+        <p class="total-sales">Overall Total Sales: ₹{{ total_sales }}</p>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Sales Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h2 {
+            text-align: center;
+        }
+        .filter-form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .filter-form input, .filter-form button {
+            padding: 8px;
+            margin: 5px;
+        }
+        .total-summary {
+            margin-top: 10px;
+            text-align: right;
+            font-weight: bold;
+        }
+        a{
+            color: white;
+            text-decoration: none;
+        }
+        #bn{
+            background-color: #007BFF;
+            width: 160px;
+            height: 35px;
+        }
+    </style>
+</head>
+<body>
+    <button id="bn"><a href="{% url 'adminhome2' %}">Home</a></button>
+
+    <h2>Product Sales Report</h2>
+
+    <form method="get" class="filter-form">
+        <label>Start Date:</label>
+        <input type="date" name="start_date" value="{{ start_date }}">
+        <label>End Date:</label>
+        <input type="date" name="end_date" value="{{ end_date }}">
+        <button type="submit">Filter</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>S.No</th>
+                <th>Product Name</th>
+                <th>Total Quantity Sold</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in sales_data %}
+            <tr>
+                <td>{{forloop.counter}}</td>
+                <td>{{ data.product__name }}</td>
+                <td>{{ data.total_quantity }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="text-align:center;">No sales data available for the selected period.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

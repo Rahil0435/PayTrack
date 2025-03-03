@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from datetime import date
 
-class Product(models.Model):
+class Product2(models.Model):
     name = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.IntegerField(default=0)  
@@ -10,8 +10,8 @@ class Product(models.Model):
     def __str__(self):
         return self.name
     
-class Production(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='productions')
+class Production2(models.Model):
+    product = models.ForeignKey(Product2, on_delete=models.CASCADE, related_name='productions')
     date = models.DateField(default=timezone.now)
     quantity_added = models.IntegerField()
 
@@ -21,8 +21,8 @@ class Production(models.Model):
         self.product.save()
         super().save(*args, **kwargs)
 
-class ProductionHistory(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+class ProductionHistory2(models.Model):
+    product = models.ForeignKey(Product2, on_delete=models.CASCADE)
     date = models.DateField(auto_now_add=True)
     quantity_produced = models.PositiveIntegerField()
 
@@ -30,7 +30,7 @@ class ProductionHistory(models.Model):
         return f"{self.product.name} - {self.quantity_produced} on {self.date}"
 
 
-class Invoice(models.Model):
+class Invoice2(models.Model):
     date = models.DateField()
     customer = models.CharField(max_length=30, default="Unknown Customer")
     invoice_number = models.CharField(max_length=20, unique=True, blank=True)  # Allow blank to generate in save()
@@ -45,7 +45,7 @@ class Invoice(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.invoice_number:  # Generate invoice number only if it's empty
-            last_invoice = Invoice.objects.order_by('-id').first()
+            last_invoice = Invoice2.objects.order_by('-id').first()
             if last_invoice:
                 last_number = int(last_invoice.invoice_number.split('-')[-1])  # Extract last number
                 new_number = f"INV-{self.date.strftime('%d%m%y')}-{last_number + 1:03d}"
@@ -58,9 +58,9 @@ class Invoice(models.Model):
     def __str__(self):
         return self.invoice_number
 
-class InvoiceItem(models.Model):
-    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='invoice_items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+class InvoiceItem2(models.Model):
+    invoice = models.ForeignKey(Invoice2, on_delete=models.CASCADE, related_name='invoice_items')
+    product = models.ForeignKey(Product2, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Add default value
@@ -69,17 +69,17 @@ class InvoiceItem(models.Model):
     def __str__(self):
         return f"{self.product.name} - {self.quantity} units"
 
-class reg(models.Model):
+class reg2(models.Model):
     name = models.CharField(max_length=20)
     phno = models.CharField(max_length=15)  
     
-class login(models.Model):
+class login2(models.Model):
     uname = models.CharField(max_length=20)
     pswd = models.CharField(max_length=128)  
     utype = models.CharField(max_length=20)
-    uid = models.ForeignKey(reg, on_delete=models.CASCADE)
+    uid = models.ForeignKey(reg2, on_delete=models.CASCADE)
 
-class Factorysale(models.Model):
+class Factorysale2(models.Model):
     date = models.DateField(default=date.today)  # Auto-set to today's date
     flavor = models.CharField(max_length=100)  # Flavor name
     quantity = models.PositiveIntegerField()  # Quantity sold

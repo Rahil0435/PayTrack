@@ -19,6 +19,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 import app.views
+import app2.views
 from django.http import HttpResponseNotFound
 from django.views.generic import RedirectView
 
@@ -53,5 +54,29 @@ urlpatterns = [
     path('factorysale/',app.views.create_factory_sale, name='factorysale'),
     path('factorysalelist/',app.views.factory_sale_list, name='factorysalelist'),
     path('factorysale/delete/<int:sale_id>/',app.views.delete_factory_sale, name='delete_factory_sale'),
+    
+    path('login2/', app2.views.Login2, name='login2'),
+    path('form2/', app2.views.registration2, name='form2'),
+    path('userhome2/', app2.views.userhome2, name='userhome2'),
+    path('addproduct2/',app2.views.add_product2, name='addproduct2'),
+    path('addproduction2/',app2.views.add_production2, name='addproduction2'),
+    path('productlist2/',app2.views.product_list2, name='productlist2'),
+    path('productionhistory2/', app2.views.production_history2, name='productionhistory2'),
+    path('get_stock2/<int:product_id>/',app2.views.get_stock2, name='get_stock2'),
+    path('createinvoice2/',app2.views.createinvoice2,name='createinvoice2'),
+    path('invoicelist2/',app2.views.invoice_list2, name='invoicelist2'),
+    path('invoice2/<int:invoice_id>/',app2.views.invoice_detail2, name='invoice_detail2'),
+    path('logout2/',app2.views.logoutview2, name='logout2'),
+    path('invoice2/<int:invoice_id>/pdf/',app2.views.generate_pdf2, name='generate_pdf2'),
+    path('invoice/delete2/<int:invoice_id>/',app2.views.delete_invoice2, name='delete_invoice2'),
+    path('salesreport2/',app2.views.sales_report2, name='salesreport2'),
+    path('product_sales_report2/',app2.views.product_sales_report2, name='product_sales_report2'),
+    path('stock_edit2/',app2.views.stock_edit2, name='stock_edit2'), 
+    path('editinvoice2/<int:invoice_id>/',app2.views.edit_invoice2, name='editinvoice2'), 
+    path('factorysale2/',app2.views.create_factory_sale2, name='factorysale2'),
+    path('factorysalelist2/',app2.views.factory_sale_list2, name='factorysalelist2'),
+    path('factorysale/delete2/<int:sale_id>/',app2.views.delete_factory_sale2, name='delete_factory_sale2'),
+    path('adminhome2/', app2.views.adminhome2, name='adminhome2'),
+
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

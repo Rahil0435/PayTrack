@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.http import HttpResponse, JsonResponse
-from .models import Product, Production, ProductionHistory, Invoice, InvoiceItem, reg, login,Factorysale
-from .forms import ProductionForm, ProductForm, InvoiceForm,FactorySaleForm
+from .models import Product2, Production2, ProductionHistory2, Invoice2, InvoiceItem2, reg2, login2,Factorysale2
+from .forms import ProductionForm2, ProductForm2, InvoiceForm2,FactorySaleForm2
 from django.db import transaction,IntegrityError
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -18,29 +18,25 @@ from django.http import HttpResponseNotAllowed
 from django.views.decorators.cache import never_cache
 from django.utils.timezone import now
 from django.db.models import Sum,F
+from decimal import Decimal
+
 
 
 
 # Create your views here.
-
-def Home(request):
-    template = loader.get_template("base.html")
-    context = {}
-    return HttpResponse(template.render(context, request))
-
-def add_product(request):
+def add_product2(request):
     if request.method == 'POST':
-        form = ProductForm(request.POST)
+        form = ProductForm2(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('productlist')
+            return redirect('productlist2')
     else:
-        form = ProductForm()
-    return render(request, 'add product.html', {'form': form})
+        form = ProductForm2()
+    return render(request, 'add product2.html', {'form': form})
 
-def add_production(request):
+def add_production2(request):
     if request.method == 'POST':
-        form = ProductionForm(request.POST)
+        form = ProductionForm2(request.POST)
         if form.is_valid():
             production = form.save(commit=False)  # Save the form but don't commit yet
             product = production.product  # Get the associated product
@@ -64,7 +60,7 @@ def add_production(request):
             print(f"Production saved: ID={production.id}, Product={product.name}, Quantity Added={production.quantity_added}")
 
             # Add production history
-            ProductionHistory.objects.create(
+            ProductionHistory2.objects.create(
                 product=product,
                 quantity_produced=production.quantity_added,
                 date=production.date
@@ -73,30 +69,30 @@ def add_production(request):
             # Debugging output: Production history saved
             print(f"Production history saved for product {product.name} with quantity {production.quantity_added}")
 
-            return redirect('productlist')  # Redirect to product list after successful save
+            return redirect('productlist2')  # Redirect to product list after successful save
     else:
-        form = ProductionForm()
+        form = ProductionForm2()
 
-    return render(request, 'addproduction.html', {'form': form})
+    return render(request, 'addproduction2.html', {'form': form})
 
-def product_list(request):
-    products = Product.objects.all().order_by('price')  # Sorting by price (ascending)
-    return render(request, 'Stock_list.html', {'products': products})
+def product_list2(request):
+    products = Product2.objects.all().order_by('price')  # Sorting by price (ascending)
+    return render(request, 'Stock_list2.html', {'products': products})
 
-def production_history(request):
-    history = ProductionHistory.objects.all()
-    return render(request, 'production_history.html', {'history': history})
+def production_history2(request):
+    history = ProductionHistory2.objects.all()
+    return render(request, 'production_history2.html', {'history': history})
 
-def get_stock(request, product_id):
+def get_stock2(request, product_id):
     try:
-        product = Product.objects.get(id=product_id)
+        product = Product2.objects.get(id=product_id)
         return JsonResponse({'product_name': product.name, 'stock': product.quantity})    
-    except Product.DoesNotExist:
+    except Product2.DoesNotExist:
         return JsonResponse({'error': 'Product not found'}, status=404)
     
 
-def createinvoice(request):  
-    invoice_form = InvoiceForm(request.POST or None)
+def createinvoice2(request):  
+    invoice_form = InvoiceForm2(request.POST or None)
 
     if request.method == 'POST':
         if invoice_form.is_valid():
@@ -114,7 +110,7 @@ def createinvoice(request):
                     if not any(products) and not any(accessory_prices):  # Ensure at least one item
                         messages.error(request, "Please add at least one product or accessory.")
                         invoice.delete()
-                        return redirect('createinvoice')
+                        return redirect('createinvoice2')
 
                     product_total = 0  
                     accessory_total = 0  
@@ -127,14 +123,14 @@ def createinvoice(request):
                             quantity = int(quantities[i].strip()) if quantities[i].strip() else 0
 
                             if product_id and quantity > 0:
-                                product = get_object_or_404(Product, id=product_id)
+                                product = get_object_or_404(Product2, id=product_id)
 
                                 if product.quantity >= quantity:
                                     price = product.price
                                     subtotal = price * quantity
                                     product_total += subtotal  
 
-                                    InvoiceItem.objects.create(
+                                    InvoiceItem2.objects.create(
                                         invoice=invoice,
                                         product=product,
                                         quantity=quantity,
@@ -147,10 +143,10 @@ def createinvoice(request):
                                 else:
                                     messages.warning(request, f"Not enough stock for {product.name}. Skipped.")
 
-                        except (ValueError, Product.DoesNotExist):
+                        except (ValueError, Product2.DoesNotExist):
                             messages.error(request, "Invalid product selection.")
                             invoice.delete()
-                            return redirect('createinvoice')
+                            return redirect('createinvoice2')
 
                     # Process accessories
                     for j in range(len(accessory_prices)):
@@ -162,7 +158,7 @@ def createinvoice(request):
                                 subtotal = accessory_price * accessory_quantity
                                 accessory_total += subtotal  
 
-                                InvoiceItem.objects.create(
+                                InvoiceItem2.objects.create(
                                     invoice=invoice,
                                     product=None,  # No product for accessories
                                     quantity=accessory_quantity,
@@ -174,12 +170,12 @@ def createinvoice(request):
                         except ValueError:
                             messages.error(request, "Invalid accessory price or quantity entered.")
                             invoice.delete()
-                            return redirect('createinvoice')
+                            return redirect('createinvoice2')
 
                     if valid_items == 0:
                         invoice.delete()  
                         messages.error(request, "No valid items to create an invoice.")
-                        return redirect('createinvoice')
+                        return redirect('createinvoice2')
 
                     # Apply discount ONLY to product total
                     discount_percentage = invoice.discount_percentage or 0
@@ -199,15 +195,15 @@ def createinvoice(request):
 
 
                     messages.success(request, f"Invoice {invoice.invoice_number} created successfully!")
-                    return redirect('invoicelist')
+                    return redirect('invoicelist2')
 
             except IntegrityError:
                 messages.error(request, "Invoice creation failed due to a system error. Please try again.")
             except Exception as e:
                 messages.error(request, f"An unexpected error occurred: {e}")
 
-    products = Product.objects.all()
-    return render(request, 'create invoice.html', {  
+    products = Product2.objects.all()
+    return render(request, 'create invoice2.html', {  
         'invoice_form': invoice_form,
         'products': products,
     })
@@ -215,21 +211,21 @@ def createinvoice(request):
 
 
 
-def invoice_list(request):
-    invoices = Invoice.objects.all().order_by('-date')
+def invoice_list2(request):
+    invoices = Invoice2.objects.all().order_by('-date')
     paginator = Paginator(invoices, 10)  # Paginate with 10 invoices per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'invoice list.html', {'page_obj': page_obj})
+    return render(request, 'invoice list2.html', {'page_obj': page_obj})
 
-def invoice_detail(request, invoice_id):
-    invoice = get_object_or_404(Invoice, id=invoice_id)
-    items = InvoiceItem.objects.filter(invoice=invoice)
+def invoice_detail2(request, invoice_id):
+    invoice = get_object_or_404(Invoice2, id=invoice_id)
+    items = InvoiceItem2.objects.filter(invoice=invoice)
     total_qty = sum(item.quantity for item in items)
     subtotal = sum(item.quantity * item.price for item in items)
     discount_amount = (subtotal * invoice.discount_percentage) / 100 if invoice.discount_percentage else 0
-    accessory=Invoice.accessory_price
+    accessory=Invoice2.accessory_price
     accessory = Decimal(getattr(invoice, "accessory_price", 0))  
     total_amount = subtotal - discount_amount
     context = {
@@ -241,67 +237,67 @@ def invoice_detail(request, invoice_id):
         'total_qty': total_qty,
         'accessory':accessory
     }
-    return render(request, 'invoice details.html', context)
+    return render(request, 'invoice details2.html', context)
 
-def Login(request):
+def Login2(request):
     if request.method == 'POST':
         uname = request.POST.get("uname")
         psw = request.POST.get("pswd")
         try:
-            l = login.objects.get(uname=uname, pswd=psw)
+            l = login2.objects.get(uname=uname, pswd=psw)
             if l.utype == "user":
                 request.session["uid"] = l.uid_id
-                return HttpResponse("<script>alert('Welcome User');window.location='/userhome';</script>")
+                return HttpResponse("<script>alert('Welcome User');window.location='/userhome2';</script>")
             elif l.utype == "admin":
                 request.session["uid"] = l.uid_id
-                return HttpResponse("<script>alert('Welcome Admin');window.location='/adminhome';</script>")
+                return HttpResponse("<script>alert('Welcome Admin');window.location='/adminhome2';</script>")
 
-        except login.DoesNotExist:
-            return HttpResponse("<script>alert('Invalid username or password.');window.location='/login';</script>")
+        except login2.DoesNotExist:
+            return HttpResponse("<script>alert('Invalid username or password.');window.location='/login2';</script>")
 
-    template = loader.get_template("login.html")
+    template = loader.get_template("login2.html")
     context = {}
     return HttpResponse(template.render(context, request))
 
-def registration(request):
+def registration2(request):
     if request.method == "POST":
-        r = reg()
+        r = reg2()
         r.name = request.POST.get("Name")
         r.phno = request.POST.get("phno")
         r.save()
-        id = reg.objects.latest("id").id
-        l = login()
+        id = reg2.objects.latest("id").id
+        l = login2()
         l.uname = request.POST.get("uname")
         l.pswd = request.POST.get("psw")
         l.utype = 'user'
         l.uid_id = id
         l.save()
-        return HttpResponse("<script>alert('Registered successfully');window.location='/login';</script>")
+        return HttpResponse("<script>alert('Registered successfully');window.location='/login2';</script>")
 
-    template = loader.get_template("reg.html")
+    template = loader.get_template("reg2.html")
     context = {}
     return HttpResponse(template.render(context, request))
 
 @never_cache
-def userhome(request):
-    template = loader.get_template("userhome.html")
+def userhome2(request):
+    template = loader.get_template("userhome2.html")
     context = {}
     return HttpResponse(template.render(context, request))
 
-def logoutview(request):
+def logoutview2(request):
     logout(request)  # Logs out the user
     request.session.flush()  # Clears session data
 
-    response = redirect('login')  # Redirects to login page
+    response = redirect('login2')  # Redirects to login page
     response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
 
     return response
 
-def generate_pdf(request, invoice_id):
+def generate_pdf2(request, invoice_id):
     # Fetch invoice data from your database
-    invoice = get_object_or_404(Invoice, pk=invoice_id)  # Adjust according to your model
+    invoice = get_object_or_404(Invoice2, pk=invoice_id)  # Adjust according to your model
     items = invoice.items.all()  # Assuming items are related to the invoice
 
     # Render the HTML template with the invoice data
@@ -328,11 +324,11 @@ def generate_pdf(request, invoice_id):
 
 
 
-def delete_invoice(request, invoice_id):
+def delete_invoice2(request, invoice_id):
     if request.method == 'POST':  # Only allow POST
-        invoice = get_object_or_404(Invoice, id=invoice_id)
+        invoice = get_object_or_404(Invoice2, id=invoice_id)
 
-        invoice_items = InvoiceItem.objects.filter(invoice=invoice)
+        invoice_items = InvoiceItem2.objects.filter(invoice=invoice)
         for item in invoice_items:
             product = item.product
             product.quantity += item.quantity  
@@ -340,19 +336,19 @@ def delete_invoice(request, invoice_id):
 
         invoice.delete()  # Now delete the invoice
         messages.success(request, f"Invoice {invoice.invoice_number} deleted successfully! Product stock has been updated.")
-        return HttpResponse("<script>alert('Invoice deleted successfully! Product stock has been updated.');window.location='/invoicelist';</script>")
+        return HttpResponse("<script>alert('Invoice deleted successfully! Product stock has been updated.');window.location='/invoicelist2';</script>")
 
     return HttpResponseNotAllowed(['POST']) 
 
 
-def adminhome(request):
-    template = loader.get_template("adminhome.html")
+def adminhome2(request):
+    template = loader.get_template("adminhome2.html")
     context = {}
     return HttpResponse(template.render(context, request))
 
-def sales_report(request):
-    invoices = Invoice.objects.all()
-    factory_sales = Factorysale.objects.all()
+def sales_report2(request):
+    invoices = Invoice2.objects.all()
+    factory_sales = Factorysale2.objects.all()
     today = now().date()
     start_date = request.GET.get('start_date', today)
     end_date = request.GET.get('end_date', today)
@@ -378,9 +374,9 @@ def sales_report(request):
         'start_date': start_date,
         'end_date': end_date,
     }
-    return render(request, 'sales_report.html', context)
+    return render(request, 'sales_report2.html', context)
 
-def product_sales_report(request):
+def product_sales_report2(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
     if not start_date:
@@ -389,7 +385,7 @@ def product_sales_report(request):
         try:
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
         except ValueError:
-            return render(request, "product_sales_report.html", {"error": "Invalid start date format"})
+            return render(request, "product_sales_report2.html", {"error": "Invalid start date format"})
 
     if not end_date:
         end_date = datetime.today().date()
@@ -397,9 +393,9 @@ def product_sales_report(request):
         try:
             end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
         except ValueError:
-            return render(request, "product_sales_report.html", {"error": "Invalid end date format"})
+            return render(request, "product_sales_report2.html", {"error": "Invalid end date format"})
     sales_data = (
-        InvoiceItem.objects
+        InvoiceItem2.objects
         .filter(invoice__date__range=[start_date, end_date]) 
         .values('product__name') 
         .annotate(
@@ -407,15 +403,15 @@ def product_sales_report(request):
         )
         .order_by('-total_quantity')
     )
-    return render(request, "product_sales_report.html", {
+    return render(request, "product_sales_report2.html", {
         "sales_data": sales_data,
         "start_date": start_date,
         "end_date": end_date
     })
 
-def stock_edit(request):
+def stock_edit2(request):
     """View to display and edit stock list by the admin"""
-    products = Product.objects.all()
+    products = Product2.objects.all()
 
     if request.method == "POST":
         for product in products:
@@ -433,21 +429,21 @@ def stock_edit(request):
                     messages.error(request, f"Invalid input for {product.name}")
 
         messages.success(request, "Stock updated successfully!")
-        return redirect('stock_edit')  # Redirect to avoid resubmission
+        return redirect('stock_edit2')  # Redirect to avoid resubmission
 
-    return render(request, 'stock_edit.html', {'products': products})
+    return render(request, 'stock_edit2.html', {'products': products})
 
 import json
 from decimal import Decimal
 
-def decimal_to_float(obj):
+def decimal_to_float2(obj):
     if isinstance(obj, Decimal):
         return float(obj)
     raise TypeError
 
 
-def edit_invoice(request, invoice_id):
-    invoice = get_object_or_404(Invoice, id=invoice_id)
+def edit_invoice2(request, invoice_id):
+    invoice = get_object_or_404(Invoice2, id=invoice_id)
 
     if request.method == "POST":
         try:
@@ -479,7 +475,7 @@ def edit_invoice(request, invoice_id):
             total_amount = Decimal(0)
             skipped_items = []
             for product_id, quantity in zip(product_ids, quantities):
-                product = get_object_or_404(Product, id=product_id)
+                product = get_object_or_404(Product2, id=product_id)
                 quantity = int(quantity)
 
                 if product.quantity < quantity:
@@ -494,7 +490,7 @@ def edit_invoice(request, invoice_id):
                 product.quantity -= quantity
                 product.save()
 
-                InvoiceItem.objects.create(
+                InvoiceItem2.objects.create(
                     invoice=invoice,
                     product=product,
                     quantity=quantity,
@@ -515,9 +511,9 @@ def edit_invoice(request, invoice_id):
 
             if skipped_items:
                 skipped_message = f"Invoice updated, items skipped due to insufficient stock: {', '.join(skipped_items)}"
-                return HttpResponse(f"<script>alert('{skipped_message}');window.location='/invoicelist';</script>")
+                return HttpResponse(f"<script>alert('{skipped_message}');window.location='/invoicelist2';</script>")
             else:
-                return HttpResponse("<script>alert('Invoice Updated successfully!');window.location='/invoicelist';</script>")
+                return HttpResponse("<script>alert('Invoice Updated successfully!');window.location='/invoicelist2';</script>")
 
         except ValueError:
             return JsonResponse({"success": False, "message": "Invalid number format."})
@@ -525,7 +521,7 @@ def edit_invoice(request, invoice_id):
             return JsonResponse({"success": False, "message": str(e)})
 
     invoice_items = invoice.invoice_items.all()
-    products = Product.objects.all()
+    products = Product2.objects.all()
 
     invoice_data = {
         "id": invoice.id,
@@ -543,33 +539,33 @@ def edit_invoice(request, invoice_id):
         ]
     }
 
-    return render(request, 'Edit invoice.html', {
+    return render(request, 'Edit invoice2.html', {
         'invoice': invoice,
         'invoice_json': json.dumps(invoice_data),
         'products': products
     })
 
-def create_factory_sale(request):
+def create_factory_sale2(request):
     if request.method == 'POST':
-        form = FactorySaleForm(request.POST)
+        form = FactorySaleForm2(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Factory Sale added successfully!")
-            return redirect('factorysalelist')  
+            return redirect('factorysalelist2')  
         else:
             messages.error(request, "Error in form submission.")
 
     else:
-        form = FactorySaleForm()
+        form = FactorySaleForm2()
 
-    return render(request, 'create_factory_sale.html', {'form': form})
+    return render(request, 'create_factory_sale2.html', {'form': form})
 
-def factory_sale_list(request):
-    sales = Factorysale.objects.all().order_by('-date')
-    return render(request, 'factory_sale_list.html', {'sales': sales})
+def factory_sale_list2(request):
+    sales = Factorysale2.objects.all().order_by('-date')
+    return render(request, 'factory_sale_list2.html', {'sales': sales})
 
-def delete_factory_sale(request, sale_id):
-    sale = get_object_or_404(Factorysale, id=sale_id)
+def delete_factory_sale2(request, sale_id):
+    sale = get_object_or_404(Factorysale2, id=sale_id)
     sale.delete()
     messages.success(request, "Factory Sale deleted successfully!")
-    return redirect('factorysalelist')
+    return redirect('factorysalelist2')

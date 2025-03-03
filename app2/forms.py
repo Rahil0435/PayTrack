@@ -1,21 +1,21 @@
 from django import forms
-from .models import Product,Production,Invoice, InvoiceItem,Factorysale
+from .models import Product2,Production2,Invoice2, InvoiceItem2,Factorysale2
 from django.utils import timezone
 from datetime import timezone
 
-class ProductForm(forms.ModelForm):
+class ProductForm2(forms.ModelForm):
     class Meta:
-        model = Product
+        model = Product2
         fields = ['name', 'price', 'quantity']
 
-class ProductionForm(forms.ModelForm):
+class ProductionForm2(forms.ModelForm):
     class Meta:
-        model = Production
+        model = Production2
         fields = ['product', 'quantity_added']
 
-class InvoiceForm(forms.ModelForm):
+class InvoiceForm2(forms.ModelForm):
     class Meta:
-        model = Invoice
+        model = Invoice2
         fields = ['customer', 'discount_percentage', 'date','accessory_quantity','accessory_price']
         widgets = {
             'discount_percentage': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'max': '100', 'value': '0', 'step': '0.01'}),
@@ -37,9 +37,9 @@ class InvoiceForm(forms.ModelForm):
         return invoice
 
 
-class InvoiceItemForm(forms.ModelForm):
+class InvoiceItemForm2(forms.ModelForm):
     class Meta:
-        model = InvoiceItem
+        model = InvoiceItem2
         fields = ['product', 'quantity']
         widgets = {
             'product': forms.Select(attrs={'class': 'product-select'}),
@@ -47,7 +47,7 @@ class InvoiceItemForm(forms.ModelForm):
         }
 
 
-class InvoiceWithItemsForm(forms.Form):
+class InvoiceWithItemsForm2(forms.Form):
     customer = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Customer Name'}))
     date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
     invoice_number = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
@@ -65,9 +65,9 @@ class InvoiceWithItemsForm(forms.Form):
 
         return cleaned_data
 
-class FactorySaleForm(forms.ModelForm):
+class FactorySaleForm2(forms.ModelForm):
     class Meta:
-        model = Factorysale
+        model = Factorysale2
         fields = ['flavor', 'quantity', 'total_amount']
         widgets = {
          'quantity': forms.NumberInput(attrs={'min': 1, 'class': 'quantity-input'}),

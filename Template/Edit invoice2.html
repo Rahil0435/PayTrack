@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Invoice</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .company-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .company-header h1 {
+            margin: 0;
+            font-size: 28px;
+            color: #0056b3;
+            font-weight: 700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #0056b3;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="company-header">
+            <h1>LICKEES</h1>
+            <p><b>Lick It Like It</b></p>
+            <p>GST Number: 29AAGCE2994J1Z2</p>
+        </div>
+        <h2>Edit Invoice</h2>
+        <form method="post" id="invoice-form">
+            {% csrf_token %}
+            <input type="hidden" name="invoice_id" value="{{ invoice.id }}">
+            <table>
+                <tr>
+                    <th>Customer</th>
+                    <td><input type="text" name="customer" value="{{ invoice.customer }}" required></td>
+                </tr>
+                <tr>
+                    <th>Date</th>
+                    <td><input type="date" name="date" value="{{ invoice.date|date:'Y-m-d' }}" required readonly></td>
+                </tr>
+                <tr>
+                    <th>Discount (%)</th>
+                    <td><input type="number" name="discount_percentage" id="discountInput" value="{{ invoice.discount_percentage }}" min="0" max="100" oninput="updateTotal()"></td>
+                </tr>
+            </table>
+            <button type="button" onclick="addRow()">Add Product</button>
+            <table id="productTable">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in invoice.invoice_items.all %}
+                    <tr>
+                        <td>
+                            <select name="products[]" class="product-select" onchange="updatePrice(this)">
+                                <option value="" disabled>Select a product</option>
+                                {% for product in products %}
+                                <option value="{{ product.id }}" data-price="{{ product.price }}" {% if item.product.id == product.id %} selected {% endif %}>
+                                    {{ product.name }} - {{ product.quantity }} in stock
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><input type="number" name="quantities[]" class="quantity-input" min="1" value="{{ item.quantity }}" onchange="updateSubtotal(this)"></td>
+                        <td class="price-cell">{{ item.price }}</td>
+                        <td class="subtotal-cell">{{ item.subtotal }}</td>
+                        <td><button type="button" onclick="removeRow(this)">Remove</button></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="invoice-footer">
+                <div class="total">
+                    Total Amount: ₹<span id="totalAmount">{{ invoice.total_amount }}</span>
+                </div>
+                <button type="submit">Update Invoice</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+    // Function to load invoice data into the form when editing
+    function loadInvoiceData(invoice) {
+        document.querySelector('input[name="customer"]').value = invoice.customer;
+        document.querySelector('input[name="date"]').value = invoice.date;
+        document.getElementById('discountInput').value = invoice.discount;
+        document.getElementById('totalAmount').textContent = invoice.total.toFixed(2);
+
+        const tableBody = document.querySelector('#productTable tbody');
+        tableBody.innerHTML = '';
+
+        invoice.items.forEach(item => {
+            addRow(item.product_id, item.quantity, item.price);
+        });
+
+        updateTotal();
+    }
+
+    // Function to add a new product row
+    function addRow(productId = '', quantity = 1, price = 0) {
+        const tableBody = document.querySelector('#productTable tbody');
+        const row = tableBody.insertRow();
+
+        let productOptions = `<option value="" disabled ${productId ? '' : 'selected'}>Select a product</option>`;
+
+        {% for product in products %}
+            productOptions += `<option value="{{ product.id }}" data-price="{{ product.price }}" 
+                ${productId == {{ product.id }} ? 'selected' : ''}>
+                {{ product.name }} - {{ product.quantity }} in stock
+            </option>`;
+        {% endfor %}
+
+        row.innerHTML = `
+            <td>
+                <select name="products[]" class="product-select" onchange="updatePrice(this)">
+                    ${productOptions}
+                </select>
+            </td>
+            <td><input type="number" name="quantities[]" class="quantity-input" min="1" value="${quantity}" onchange="updateSubtotal(this)"></td>
+            <td class="price-cell">${price.toFixed(2)}</td>
+            <td class="subtotal-cell">${(quantity * price).toFixed(2)}</td>
+            <td><button type="button" onclick="removeRow(this)">Remove</button></td>
+        `;
+
+        updateTotal();
+    }
+
+    // Function to update price when a product is selected
+    function updatePrice(selectElement) {
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+
+        const row = selectElement.closest('tr');
+        row.querySelector('.price-cell').textContent = price.toFixed(2);
+
+        const quantityInput = row.querySelector('.quantity-input');
+        updateSubtotal(quantityInput);
+    }
+
+    // Function to update subtotal when quantity changes
+    function updateSubtotal(inputElement) {
+        const row = inputElement.closest('tr');
+        const quantity = parseFloat(inputElement.value) || 0;
+        const price = parseFloat(row.querySelector('.price-cell').textContent) || 0;
+
+        const subtotal = quantity * price;
+        row.querySelector('.subtotal-cell').textContent = subtotal.toFixed(2);
+
+        updateTotal();
+    }
+
+    // Function to remove a product row
+    function removeRow(button) {
+        const row = button.closest('tr');
+        row.remove();
+        updateTotal();
+    }
+
+    // Function to update total when discount or products change
+    function updateTotal() {
+        let total = 0;
+        document.querySelectorAll('.subtotal-cell').forEach(subtotalCell => {
+            total += parseFloat(subtotalCell.textContent) || 0;
+        });
+
+        const discountPercentage = parseFloat(document.getElementById('discountInput').value) || 0;
+        total -= (total * discountPercentage) / 100;
+
+        document.getElementById('totalAmount').textContent = total.toFixed(2);
+    }
+
+    // Load invoice data when the page loads
+    window.onload = function () {
+        let invoiceData = JSON.parse('{{ invoice_json|escapejs }}');
+        loadInvoiceData(invoiceData);
+    };
+
+    // Function to handle invoice update
+    document.getElementById("updateInvoice").addEventListener("click", function (event) {
+        event.preventDefault(); // Prevent default form submission
+
+        let invoiceData = {
+            id: "{{ invoice.id }}",
+            customer: document.querySelector('input[name="customer"]').value,
+            date: document.querySelector('input[name="date"]').value,
+            discount: parseFloat(document.getElementById('discountInput').value) || 0,
+            total: parseFloat(document.getElementById('totalAmount').textContent) || 0,
+            items: []
+        };
+
+        document.querySelectorAll("#productTable tbody tr").forEach(row => {
+            let productId = row.querySelector('.product-select').value;
+            let quantity = parseInt(row.querySelector('.quantity-input').value);
+            let price = parseFloat(row.querySelector('.price-cell').textContent);
+            let subtotal = parseFloat(row.querySelector('.subtotal-cell').textContent);
+
+            if (productId) {
+                invoiceData.items.push({
+                    product_id: productId,
+                    quantity: quantity,
+                    price: price,
+                    subtotal: subtotal
+                });
+            }
+        });
+
+        console.log("Sending invoice data:", invoiceData); // Debugging log
+
+        fetch(window.location.href, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify(invoiceData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Response from server:", data); 
+            if (data.success) {
+                alert("Invoice updated successfully!");
+                window.location.href = "{% url 'invoicelist' %}"; 
+            } else {
+                alert("Error updating invoice: " + data.message);
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+</script>
+
+    
+    
+</body>
+
+</html>
