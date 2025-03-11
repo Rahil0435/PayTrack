@@ -87,13 +87,20 @@ def production_history(request):
     history = ProductionHistory.objects.all()
     return render(request, 'production_history.html', {'history': history})
 
-def get_stock(request, product_id):
+
+def get_stock(request, product_id=None):
     try:
-        product = Product.objects.get(id=product_id)
-        return JsonResponse({'product_name': product.name, 'stock': product.quantity})    
+        if product_id:
+            product = Product.objects.get(id=product_id)
+            return JsonResponse({'product_name': product.name, 'stock': product.quantity})
+        
+        # ✅ Sort products by price (ascending order)
+        products = Product.objects.all().order_by('price').values('id', 'name', 'price', 'quantity')
+        return JsonResponse({'products': list(products)})
+
     except Product.DoesNotExist:
         return JsonResponse({'error': 'Product not found'}, status=404)
-    
+
 
 def createinvoice(request):  
     invoice_form = InvoiceForm(request.POST or None)
@@ -103,21 +110,30 @@ def createinvoice(request):
             try:
                 with transaction.atomic():
                     invoice = invoice_form.save(commit=False)
-                    invoice.invoice_number = ""  # Temporary invoice number, updated later
+                    invoice.invoice_number = ""  # Temporary invoice number
                     invoice.save()
 
                     products = request.POST.getlist('products[]')
                     quantities = request.POST.getlist('quantities[]')
-                    accessory_quantities = request.POST.getlist('accessory_quantity[]')
-                    accessory_prices = request.POST.getlist('accessory_price[]')
+                    accessory_quantities = request.POST.getlist('accessory_quantity')
+                    accessory_prices = request.POST.getlist('accessory_price')
+                    e_way = request.POST.get('e_way', "0")
 
-                    if not any(products) and not any(accessory_prices):  # Ensure at least one item
+                    # Convert e_way to Decimal
+                    try:
+                        e_way = Decimal(str(e_way).strip()) if e_way.strip() else Decimal(0)
+                    except ValueError:
+                        messages.error(request, "Invalid transportation charge entered.")
+                        invoice.delete()
+                        return redirect('createinvoice')
+
+                    if not any(products) and not any(accessory_prices):
                         messages.error(request, "Please add at least one product or accessory.")
                         invoice.delete()
                         return redirect('createinvoice')
 
-                    product_total = 0  
-                    accessory_total = 0  
+                    product_total = Decimal(0)  
+                    accessory_total = Decimal(0)  
                     valid_items = 0  
 
                     # Process products
@@ -130,7 +146,7 @@ def createinvoice(request):
                                 product = get_object_or_404(Product, id=product_id)
 
                                 if product.quantity >= quantity:
-                                    price = product.price
+                                    price = Decimal(str(product.price))
                                     subtotal = price * quantity
                                     product_total += subtotal  
 
@@ -147,19 +163,19 @@ def createinvoice(request):
                                 else:
                                     messages.warning(request, f"Not enough stock for {product.name}. Skipped.")
 
-                        except (ValueError, Product.DoesNotExist):
-                            messages.error(request, "Invalid product selection.")
+                        except (ValueError, Product.DoesNotExist) as e:
+                            messages.error(request, f"Invalid product selection: {e}")
                             invoice.delete()
-                            return redirect('createinvoice')
+                            return redirect('createinvoice2')
 
                     # Process accessories
                     for j in range(len(accessory_prices)):
                         try:
-                            accessory_price = float(accessory_prices[j].strip()) if accessory_prices[j].strip() else 0
+                            accessory_price = Decimal(str(accessory_prices[j]).strip()) if accessory_prices[j].strip() else Decimal(0)
                             accessory_quantity = int(accessory_quantities[j].strip()) if accessory_quantities[j].strip() else 0
 
                             if accessory_price > 0 and accessory_quantity > 0:
-                                subtotal = accessory_price * accessory_quantity
+                                subtotal = accessory_price
                                 accessory_total += subtotal  
 
                                 InvoiceItem.objects.create(
@@ -171,8 +187,8 @@ def createinvoice(request):
                                 )
                                 valid_items += 1
 
-                        except ValueError:
-                            messages.error(request, "Invalid accessory price or quantity entered.")
+                        except ValueError as e:
+                            messages.error(request, f"Invalid accessory price or quantity entered: {e}")
                             invoice.delete()
                             return redirect('createinvoice')
 
@@ -182,42 +198,38 @@ def createinvoice(request):
                         return redirect('createinvoice')
 
                     # Apply discount ONLY to product total
-                    discount_percentage = invoice.discount_percentage or 0
-                    discount_amount = (product_total * discount_percentage) / 100
+                    discount_percentage = Decimal(str(invoice.discount_percentage or 0))
+                    discount_amount = (product_total * discount_percentage) / Decimal(100)
                     final_product_total = product_total - discount_amount
 
-                    # **Final total should include product total (after discount) + accessory total**
-                    accessory_total = request.POST.get("accessory_price", "0")  # Default to "0" if not provided
-                    accessory_total = Decimal(accessory_total.strip()) if accessory_total.strip() else Decimal(0)
+                    # Final amount calculation with Decimal
+                    final_amount = final_product_total + accessory_total + e_way
 
-                    final_amount = final_product_total + accessory_total  # Ensure accessory amount is included
-
-                    print(f"Product Total: {product_total}, Discount Amount: {discount_amount}, Final Product Total: {final_product_total}, Accessory Total: {accessory_total}, Final Amount: {final_amount}")
+                    # Debugging print statements
+                    print(f"Product Total: {product_total}, Discount Amount: {discount_amount}, Final Product Total: {final_product_total}")
+                    print(f"Accessory Total: {accessory_total}, Transport Charge (e_way): {e_way}, Final Amount: {final_amount}")
 
                     invoice.total_amount = final_amount
+                    invoice.e_way = e_way  
                     invoice.save()
-
 
                     messages.success(request, f"Invoice {invoice.invoice_number} created successfully!")
                     return redirect('invoicelist')
 
-            except IntegrityError:
-                messages.error(request, "Invoice creation failed due to a system error. Please try again.")
+            except IntegrityError as e:
+                messages.error(request, f"Invoice creation failed due to a system error: {e}")
             except Exception as e:
                 messages.error(request, f"An unexpected error occurred: {e}")
 
-    products = Product.objects.all()
+    products = Product.objects.all().order_by('price')
     return render(request, 'create invoice.html', {  
         'invoice_form': invoice_form,
         'products': products,
     })
 
-
-
-
 def invoice_list(request):
     invoices = Invoice.objects.all().order_by('-date')
-    paginator = Paginator(invoices, 10)  # Paginate with 10 invoices per page
+    paginator = Paginator(invoices, 12)  # Paginate with 10 invoices per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -226,12 +238,14 @@ def invoice_list(request):
 def invoice_detail(request, invoice_id):
     invoice = get_object_or_404(Invoice, id=invoice_id)
     items = InvoiceItem.objects.filter(invoice=invoice)
-    total_qty = sum(item.quantity for item in items)
+    total_qty = sum(item.quantity for item in items if item.product) 
     subtotal = sum(item.quantity * item.price for item in items)
     discount_amount = (subtotal * invoice.discount_percentage) / 100 if invoice.discount_percentage else 0
     accessory=Invoice.accessory_price
-    accessory = Decimal(getattr(invoice, "accessory_price", 0))  
-    total_amount = subtotal - discount_amount
+    accessory = Decimal(getattr(invoice, "accessory_price", 0)) 
+    e_way=Invoice.e_way
+    e_way = Decimal(getattr(invoice, "e_way", 0)) 
+    total_amount = subtotal - discount_amount + accessory + e_way
     context = {
         'invoice': invoice,
         'items': items,
@@ -239,7 +253,8 @@ def invoice_detail(request, invoice_id):
         'discount_amount': discount_amount,
         'total_amount': total_amount,
         'total_qty': total_qty,
-        'accessory':accessory
+        'accessory':accessory,
+        'e_way':e_way
     }
     return render(request, 'invoice details.html', context)
 
@@ -334,9 +349,9 @@ def delete_invoice(request, invoice_id):
 
         invoice_items = InvoiceItem.objects.filter(invoice=invoice)
         for item in invoice_items:
-            product = item.product
-            product.quantity += item.quantity  
-            product.save()
+            if item.product: 
+                item.product.quantity += item.quantity
+                item.product.save() 
 
         invoice.delete()  # Now delete the invoice
         messages.success(request, f"Invoice {invoice.invoice_number} deleted successfully! Product stock has been updated.")
@@ -467,33 +482,44 @@ def edit_invoice(request, invoice_id):
             if len(product_ids) != len(quantities):
                 return JsonResponse({"success": False, "message": "Mismatched product and quantity count."})
 
-            # Restore stock before deleting old invoice items
+            # ✅ Restore stock before deleting old invoice items
             for item in invoice.invoice_items.all():
-                item.product.quantity += item.quantity
-                item.product.save()
+                if item.product:
+                    item.product.quantity += item.quantity
+                    item.product.save()
 
-            # Clear existing invoice items
+            # ✅ Clear existing invoice items (excluding accessory items)
             invoice.invoice_items.all().delete()
 
-            # Process new items
-            total_amount = Decimal(0)
+            # ✅ Process new items
+            product_total = Decimal(0)
             skipped_items = []
             for product_id, quantity in zip(product_ids, quantities):
-                product = get_object_or_404(Product, id=product_id)
-                quantity = int(quantity)
+                product = Product.objects.filter(id=product_id).first()
+
+                if not product:
+                    skipped_items.append(f"Product ID {product_id} not found")
+                    continue
+
+                try:
+                    quantity = int(quantity)
+                except ValueError:
+                    skipped_items.append(f"Invalid quantity for {product.name}")
+                    continue
 
                 if product.quantity < quantity:
-                    skipped_items.append(product.name)
-                    continue  # Skip this product and continue with the rest
+                    skipped_items.append(f"Not enough stock for {product.name}")
+                    continue
 
-                price = product.price  # Assuming price is stored as Decimal in the Product model
+                price = product.price
                 subtotal = price * quantity
-                total_amount += subtotal
+                product_total += subtotal
 
-                # Deduct the new quantity from stock
+                # ✅ Deduct the new quantity from stock
                 product.quantity -= quantity
                 product.save()
 
+                # ✅ Create new invoice item
                 InvoiceItem.objects.create(
                     invoice=invoice,
                     product=product,
@@ -502,19 +528,22 @@ def edit_invoice(request, invoice_id):
                     subtotal=subtotal,
                 )
 
-            # Apply discount correctly
-            discount_amount = (total_amount * discount_percentage) / Decimal(100)
-            final_total = total_amount - discount_amount  # Save discounted total
+            # ✅ Apply discount only to product total
+            discount_amount = (product_total * discount_percentage) / Decimal(100)
+            final_product_total = product_total - discount_amount
 
-            # Update invoice details
+            # ✅ Final total = product total after discount + fixed accessory and e-way charges
+            final_amount = final_product_total + invoice.accessory_price + invoice.e_way
+
+            # ✅ Update invoice details
             invoice.customer = customer
             invoice.date = date
             invoice.discount_percentage = discount_percentage
-            invoice.total_amount = final_total  # Save the correct discounted total
+            invoice.total_amount = final_amount
             invoice.save()
 
             if skipped_items:
-                skipped_message = f"Invoice updated, items skipped due to insufficient stock: {', '.join(skipped_items)}"
+                skipped_message = f"Invoice updated, but some items were skipped due to issues: {', '.join(skipped_items)}"
                 return HttpResponse(f"<script>alert('{skipped_message}');window.location='/invoicelist';</script>")
             else:
                 return HttpResponse("<script>alert('Invoice Updated successfully!');window.location='/invoicelist';</script>")
@@ -524,8 +553,9 @@ def edit_invoice(request, invoice_id):
         except Exception as e:
             return JsonResponse({"success": False, "message": str(e)})
 
-    invoice_items = invoice.invoice_items.all()
-    products = Product.objects.all()
+    # ✅ Load data for rendering
+    invoice_items = InvoiceItem.objects.filter(invoice=invoice, product__isnull=False)
+    products = Product.objects.exclude(name__icontains='Accessory')
 
     invoice_data = {
         "id": invoice.id,
@@ -548,6 +578,8 @@ def edit_invoice(request, invoice_id):
         'invoice_json': json.dumps(invoice_data),
         'products': products
     })
+
+
 
 def create_factory_sale(request):
     if request.method == 'POST':

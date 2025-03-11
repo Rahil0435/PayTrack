@@ -261,29 +261,24 @@
                         <th>Subtotal</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td> 
-                        <td>
-                            {% if item.product %}
-                                {{ item.product.name }}
-                            {% elif item.accessory_name %}
-                                {{ item.accessory_name }} (Accessory)
-                            {% else %}
-                                Unknown Item
+                    <tbody>
+                        {% for item in items %}
+                            {% if item.product %}  {# Only display items with a product #}
+                            <tr>
+                                <td>{{ forloop.counter }}</td> 
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>₹{{ item.price }}</td>
+                                <td>₹{{ item.subtotal }}</td>
+                            </tr>
                             {% endif %}
-                        </td>
-                        <td>{{ item.quantity }}</td>
-                        <td>₹{{ item.price }}</td>
-                        <td>₹{{ item.subtotal }}</td>
-                    </tr>
-                    {% endfor %}
+                        {% endfor %}
                 </tbody>
             </table>
             <p style="text-align: right;"><strong>Total Boxes:({{  total_qty  }})</strong></p>
             <p style="text-align: right;"><strong>Discount: ({{ invoice.discount_percentage }}%)</strong></p>
             <p style="text-align: right;"><strong>Accessories: ({{ accessory  }})</strong></p>
+            <p style="text-align: right;"><strong>E-way: ₹({{ e_way }})</strong>
             <p style="text-align: right;"><strong>Total: ₹{{ invoice.total_amount }}</strong></p>
         </div>
     </div>

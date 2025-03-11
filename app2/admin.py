@@ -9,7 +9,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Invoice2)
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ('invoice_number', 'date', 'total_amount') 
+    list_display = ('invoice_number', 'date', 'total_amount','e_way', 'final_amount') 
 @admin.register(reg2)  
 class regAdmin(admin.ModelAdmin):
     list_display = ('name',  'phno')

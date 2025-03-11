@@ -146,62 +146,67 @@
         }
 
         @media print {
+    
     @page {
-        size: A4 portrait; /* Keep A4 format */
-        margin: 10mm; /* Adjust margin for space */
+        size: A4 portrait; 
+        margin: 10mm; 
     }
 
+    
     body {
-        font-size: 10px; /* Reduce text size for more space */
         margin: 0;
         padding: 0;
+        font-size: 10px; 
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
     .invoice-container {
         width: 100%;
-        font-size: 10px; /* Adjust font for table */
         padding: 5mm;
+        font-size: 10px;
     }
 
+   
     table {
-        font-size: 10px; /* Reduce table font */
-        border-collapse: collapse;
         width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        font-size: 10px;
     }
 
     th, td {
-        padding: 4px; /* Reduce cell padding */
+        padding: 4px;
         border: 1px solid black;
+        word-wrap: break-word; 
     }
 
+    
     th {
-        font-size: 10px; /* Reduce header font */
+        font-size: 10px;
         background: black !important;
         color: white !important;
     }
 
     td {
-        font-size: 9px; /* Reduce body font */
+        font-size: 9px;
     }
 
-    /* Adjust row height */
+   
     tr {
-        height: auto;
-        line-height: 1; /* Compact rows */
         page-break-inside: avoid;
     }
 
-    /* Hide buttons during print */
-    .buttons {
+    .buttons, .no-print {
         display: none;
     }
 
+    
     .footer {
         font-size: 9px;
     }
 }
+
 
     </style>
 
@@ -212,7 +217,7 @@
     const originalContent = document.body.innerHTML;
 
     // Apply styles for better fit
-    printContent.style.width = "80%"; // Reduce width for A4 fit
+    printContent.style.width = "90%"; // Reduce width for A4 fit
     printContent.style.margin = "0 auto"; // Center align
     printContent.style.fontSize = "12px"; // Adjust font size for readability
 
@@ -224,34 +229,6 @@
     document.body.innerHTML = originalContent;
 }
 
-
-// function downloadInvoice() {
-//     const element = document.querySelector('.invoice-container');
-//     const options = {
-//         margin: [0.2, 0.2, 0.2, 0.2], // Reduced margins for better page utilization
-//         filename: 'invoice.pdf',
-//         image: { type: 'jpeg', quality: 0.98 },
-//         html2canvas: { 
-//             scale: 2, 
-//             useCORS: true // Fix potential rendering issues
-//         },
-//         jsPDF: { 
-//             unit: 'mm', 
-//             format: 'a4', 
-//             orientation: 'portrait' 
-//         },
-//         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // Ensures content splits correctly
-//     };
-
-//     html2pdf()
-//         .set(options)
-//         .from(element)
-//         .toPdf()
-//         .get('pdf')
-//         .then(function (pdf) {
-//             pdf.save('invoice.pdf');
-//         });
-// }
 
 
     </script>
@@ -284,21 +261,24 @@
                         <th>Subtotal</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td> 
-                        <td>{{ item.product.name }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>₹{{ item.price }}</td>
-                        <td>₹{{ item.subtotal }}</td>
-                    </tr>
-                    {% endfor %}
+                    <tbody>
+                        {% for item in items %}
+                            {% if item.product %}  {# Only display items with a product #}
+                            <tr>
+                                <td>{{ forloop.counter }}</td> 
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>₹{{ item.price }}</td>
+                                <td>₹{{ item.subtotal }}</td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
                 </tbody>
             </table>
             <p style="text-align: right;"><strong>Total Boxes:({{  total_qty  }})</strong></p>
             <p style="text-align: right;"><strong>Discount: ({{ invoice.discount_percentage }}%)</strong></p>
             <p style="text-align: right;"><strong>Accessories: ({{ accessory  }})</strong></p>
+            <p style="text-align: right;"><strong>E-way: ₹({{ e_way }})</strong>
             <p style="text-align: right;"><strong>Total: ₹{{ invoice.total_amount }}</strong></p>
         </div>
     </div>
@@ -306,7 +286,6 @@
     <!-- Buttons -->
     <div class="buttons">
         <button onclick="printInvoice()">Print Invoice</button>
-        <!-- <button onclick="downloadInvoice()">Download as PDF</button> -->
     </div>
 
     <!-- Footer -->
