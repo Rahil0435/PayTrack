@@ -18,7 +18,7 @@ from django.http import HttpResponseNotAllowed
 from django.views.decorators.cache import never_cache
 from django.utils.timezone import now
 from django.db.models import Sum,F
-from decimal import Decimal
+from decimal import Decimal,InvalidOperation
 
 
 
@@ -113,6 +113,7 @@ def createinvoice2(request):
                     accessory_quantities = request.POST.getlist('accessory_quantity')
                     accessory_prices = request.POST.getlist('accessory_price')
                     e_way = request.POST.get('e_way', "0")
+                    sp_discount = request.POST.get("sp_discount","0")
 
                     # Convert e_way to Decimal
                     try:
@@ -122,9 +123,14 @@ def createinvoice2(request):
                         invoice.delete()
                         return redirect('createinvoice2')
 
+                    try:
+                        sp_discount = Decimal(str(sp_discount).strip()) if sp_discount.strip() else Decimal(0)
+                    except InvalidOperation:
+                        messages.error(request, "Invalid special discount entered.")
+                        return redirect('createinvoice2')
+
                     if not any(products) and not any(accessory_prices):
                         messages.error(request, "Please add at least one product or accessory.")
-                        invoice.delete()
                         return redirect('createinvoice2')
 
                     product_total = Decimal(0)  
@@ -198,7 +204,7 @@ def createinvoice2(request):
                     final_product_total = product_total - discount_amount
 
                     # Final amount calculation with Decimal
-                    final_amount = final_product_total + accessory_total + e_way
+                    final_amount = final_product_total + accessory_total + e_way - sp_discount
 
                     # Debugging print statements
                     print(f"Product Total: {product_total}, Discount Amount: {discount_amount}, Final Product Total: {final_product_total}")
@@ -240,6 +246,8 @@ def invoice_detail2(request, invoice_id):
     accessory = Decimal(getattr(invoice, "accessory_price", 0)) 
     e_way=Invoice2.e_way
     e_way = Decimal(getattr(invoice, "e_way", 0)) 
+    sp_discount = Invoice2.sp_discount
+    sp_discount = Decimal(getattr(invoice, "sp_discount", 0))
     total_amount = subtotal - discount_amount + accessory + e_way
     context = {
         'invoice': invoice,
@@ -249,7 +257,8 @@ def invoice_detail2(request, invoice_id):
         'total_amount': total_amount,
         'total_qty': total_qty,
         'accessory':accessory,
-        'e_way':e_way
+        'e_way':e_way,
+        'sp_discount':sp_discount,
     }
     return render(request, 'invoice details2.html', context)
 
@@ -527,7 +536,7 @@ def edit_invoice2(request, invoice_id):
             final_product_total = product_total - discount_amount
 
             # ✅ Final total = product total after discount + fixed accessory and e-way charges
-            final_amount = final_product_total + invoice.accessory_price + invoice.e_way
+            final_amount = final_product_total + invoice.accessory_price + invoice.e_way - invoice.sp_discount
 
             # ✅ Update invoice details
             invoice.customer = customer

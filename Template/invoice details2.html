@@ -138,14 +138,14 @@
         @media print {
     @page {
         size: A4 portrait;
-        margin: 1cm;
+        margin: 0.5cm;
     }
 
     body {
         margin: 0;
         padding: 0;
         font-family: Arial, sans-serif;
-        font-size: 10px;
+        font-size: 9px;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
         box-sizing: border-box;
@@ -153,8 +153,8 @@
 
     .invoice-container {
         width: 100%;
-        padding: 0.5cm;
-        font-size: 10px;
+        padding: 0.3cm;
+        font-size: 9px;
         box-sizing: border-box;
     }
 
@@ -162,27 +162,28 @@
         width: 100%;
         table-layout: fixed;
         border-collapse: collapse;
-        font-size: 10px;
-        margin-bottom: 1cm;
+        font-size: 9px;
+        margin-bottom: 0.5cm;
     }
 
     th, td {
-        padding: 5px;
+        padding: 3px; /* Reduced padding */
         border: 1px solid black;
         word-wrap: break-word;
         white-space: normal;
         box-sizing: border-box;
+        line-height: 1.2; /* Reduced line height */
     }
 
     th {
-        font-size: 10px;
+        font-size: 9px;
         background-color: black !important;
         color: white !important;
         text-align: left;
     }
 
     td {
-        font-size: 9px;
+        font-size: 8px; /* Reduced font size */
         vertical-align: top;
     }
 
@@ -190,19 +191,24 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        gap: 1cm;
+        gap: 0.5cm;
     }
 
     .summary-left,
     .summary-right {
-        width: calc(50% - 0.5cm);
+        width: calc(50% - 0.3cm);
         box-sizing: border-box;
     }
 
     .footer {
-        font-size: 9px;
-        margin-top: 1cm;
+        font-size: 8px;
+        margin-top: 0.5cm;
         text-align: center;
+    }
+
+    /* Prevent table from splitting across pages */
+    table, tr, td, th {
+        page-break-inside: avoid;
     }
 
     /* Hide unnecessary elements when printing */
@@ -266,6 +272,10 @@
                         <tr>
                             <th>Discount</th>
                             <td>{{ invoice.discount_percentage }}%</td>
+                        </tr>
+                        <tr>
+                            <th>Special Discount</th>
+                            <td>₹{{sp_discount }}</td>
                         </tr>
                     </table>
                 </div>

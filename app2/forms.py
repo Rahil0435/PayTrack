@@ -16,7 +16,7 @@ class ProductionForm2(forms.ModelForm):
 class InvoiceForm2(forms.ModelForm):
     class Meta:
         model = Invoice2
-        fields = ['customer', 'discount_percentage', 'date','accessory_quantity','accessory_price','e_way']
+        fields = ['customer', 'discount_percentage', 'date','accessory_quantity','accessory_price','e_way','sp_discount']
         widgets = {
             'discount_percentage': forms.NumberInput(attrs={'class': 'form-control', 'min': '0', 'max': '100', 'value': '0', 'step': '0.01'}),
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),

@@ -39,10 +39,11 @@ class Invoice2(models.Model):
     accessory_quantity = models.IntegerField(default=0)
     accessory_price= models.IntegerField(default=0)
     e_way = models.IntegerField(default=0)
+    sp_discount =models.IntegerField(default=0)
 
     def final_amount(self):
         discount_amount = (self.total_amount - self.accessory_price) * (self.discount_percentage / 100)
-        return (self.total_amount - discount_amount) + self.accessory_price + self.e_way
+        return (self.total_amount - discount_amount) + self.accessory_price + self.e_way - self.sp_discount
 
     def save(self, *args, **kwargs):
         if not self.invoice_number:  # Generate invoice number only if it's empty

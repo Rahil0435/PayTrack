@@ -267,8 +267,9 @@ function updateTotal() {
 
     let accessoryAmount = Math.max(parseFloat(document.getElementById('accessoryAmount').value) || 0, 0);
     let eWayAmount = Math.max(parseFloat(document.getElementById('e_way').value) || 0, 0);
+    let SP_discount = Math.max(parseFloat(document.getElementById('sp_discount').value) || 0, 0);
 
-    finalTotal += accessoryAmount + eWayAmount;
+    finalTotal += accessoryAmount + eWayAmount - SP_discount;
     finalTotal = Math.max(finalTotal, 0); // Ensure no negative total
 
     document.getElementById('totalAmount').textContent = finalTotal.toFixed(2);
@@ -282,7 +283,7 @@ window.onload = function () {
 </head>
 
 <body>
-    <button id="bn"><a href="{% url 'userhome2' %}"> Home</a></button>
+    <button id="bn"><a href="{% url 'userhome2' %}"> Home</a></button>  
     <div class="container">
 
         {% if messages %}
@@ -351,6 +352,10 @@ window.onload = function () {
                 <tr>
                     <th>E-way</th>
                     <td><input type="number" id="e_way" name="e_way" value="0" min="0" oninput="updateTotal()"></td>
+                </tr>
+                <tr>
+                    <th>sp_discount</th>
+                    <td><input type="number" id="sp_discount" name="sp_discount" value="0" min="0" oninput="updateTotal()"></td>
                 </tr>
             </table>
         
