@@ -46,7 +46,8 @@
             margin-top: 20px;
         }
 
-        th, td {
+        th,
+        td {
             padding: 10px;
             border: 1px solid #ddd;
             text-align: left;
@@ -65,12 +66,46 @@
             background-color: #f1f1f1;
         }
 
+        /* Summary Section */
+        .invoice-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 20px;
+        }
+
+        .summary-left,
+        .summary-right {
+            width: 48%; /* Adjust width to align properly */
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .summary-table th,
+        .summary-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .summary-table th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        .summary-table td {
+            background-color: #f9f9f9;
+        }
+
         /* Buttons */
         .buttons {
             margin-top: 20px;
             display: flex;
-            gap: 10px;
             justify-content: center;
+            gap: 10px;
         }
 
         button {
@@ -100,138 +135,82 @@
             margin: 5px 0;
         }
 
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 24px;
-            }
-
-            .header p {
-                font-size: 12px;
-            }
-
-            .content {
-                margin: 10px;
-            }
-
-            th, td {
-                font-size: 14px;
-                padding: 8px;
-            }
-
-            button {
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 20px;
-            }
-
-            .header p {
-                font-size: 10px;
-            }
-
-            th, td {
-                font-size: 12px;
-                padding: 6px;
-            }
-
-            button {
-                padding: 6px 10px;
-                font-size: 10px;
-            }
-        }
-
         @media print {
-    
     @page {
-        size: A4 portrait; 
-        margin: 10mm; 
+        size: A4 portrait;
+        margin: 1cm;
     }
 
-    
     body {
         margin: 0;
         padding: 0;
-        font-size: 10px; 
+        font-family: Arial, sans-serif;
+        font-size: 10px;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+        box-sizing: border-box;
     }
 
     .invoice-container {
         width: 100%;
-        padding: 5mm;
+        padding: 0.5cm;
         font-size: 10px;
+        box-sizing: border-box;
     }
 
-   
     table {
         width: 100%;
         table-layout: fixed;
         border-collapse: collapse;
         font-size: 10px;
+        margin-bottom: 1cm;
     }
 
     th, td {
-        padding: 4px;
+        padding: 5px;
         border: 1px solid black;
-        word-wrap: break-word; 
+        word-wrap: break-word;
+        white-space: normal;
+        box-sizing: border-box;
     }
 
-    
     th {
         font-size: 10px;
-        background: black !important;
+        background-color: black !important;
         color: white !important;
+        text-align: left;
     }
 
     td {
         font-size: 9px;
+        vertical-align: top;
     }
 
-   
-    tr {
-        page-break-inside: avoid;
+    .invoice-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1cm;
     }
 
+    .summary-left,
+    .summary-right {
+        width: calc(50% - 0.5cm);
+        box-sizing: border-box;
+    }
+
+    .footer {
+        font-size: 9px;
+        margin-top: 1cm;
+        text-align: center;
+    }
+
+    /* Hide unnecessary elements when printing */
     .buttons, .no-print {
         display: none;
     }
-
-    
-    .footer {
-        font-size: 9px;
-    }
 }
-
-
     </style>
-
-    <script>
-        /* Print Invoice */
-        function printInvoice() {
-    const printContent = document.querySelector('.invoice-container');
-    const originalContent = document.body.innerHTML;
-
-    // Apply styles for better fit
-    printContent.style.width = "90%"; // Reduce width for A4 fit
-    printContent.style.margin = "0 auto"; // Center align
-    printContent.style.fontSize = "12px"; // Adjust font size for readability
-
-    document.body.innerHTML = printContent.outerHTML;
-
-    window.print();
-
-    // Restore original content
-    document.body.innerHTML = originalContent;
-}
-
-
-
-    </script>
 </head>
 
 <body>
@@ -243,7 +222,7 @@
             <h1>LICKEES</h1>
             <p style="font-size: 17px;"><b>Lick It Like It</b></p>
             <p>GST Number: 29AAGCE2994J1Z2</p>
-            <p>19,Kateramma Temple Rd, Aduru, Bengaluru, Kithiganur, Karnataka</p>
+            <p>19, Kateramma Temple Rd, Aduru, Bengaluru, Kithiganur, Karnataka</p>
             <p>Invoice No: {{ invoice.invoice_number }}</p>
         </div>
 
@@ -261,31 +240,58 @@
                         <th>Subtotal</th>
                     </tr>
                 </thead>
-                    <tbody>
-                        {% for item in items %}
-                            {% if item.product %}  {# Only display items with a product #}
-                            <tr>
-                                <td>{{ forloop.counter }}</td> 
-                                <td>{{ item.product.name }}</td>
-                                <td>{{ item.quantity }}</td>
-                                <td>₹{{ item.price }}</td>
-                                <td>₹{{ item.subtotal }}</td>
-                            </tr>
-                            {% endif %}
-                        {% endfor %}
+                <tbody>
+                    {% for item in items %}
+                    {% if item.product %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>₹{{ item.price }}</td>
+                        <td>₹{{ item.subtotal }}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
                 </tbody>
             </table>
-            <p style="text-align: right;"><strong>Total Boxes:({{  total_qty  }})</strong></p>
-            <p style="text-align: right;"><strong>Discount: ({{ invoice.discount_percentage }}%)</strong></p>
-            <p style="text-align: right;"><strong>Accessories: ({{ accessory  }})</strong></p>
-            <p style="text-align: right;"><strong>E-way: ₹({{ e_way }})</strong>
-            <p style="text-align: right;"><strong>Total: ₹{{ invoice.total_amount }}</strong></p>
+
+            <!-- Summary Section -->
+            <div class="invoice-summary">
+                <div class="summary-left">
+                    <table class="summary-table">
+                        <tr>
+                            <th>Total Boxes</th>
+                            <td>{{ total_qty }}</td>
+                        </tr>
+                        <tr>
+                            <th>Discount</th>
+                            <td>{{ invoice.discount_percentage }}%</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="summary-right">
+                    <table class="summary-table">
+                        <tr>
+                            <th>Accessories</th>
+                            <td>₹{{ accessory }}</td>
+                        </tr>
+                        <tr>
+                            <th>E-way</th>
+                            <td>₹{{ e_way }}</td>
+                        </tr>
+                        <tr>
+                            <th>Grand Total</th>
+                            <td><strong>₹{{ invoice.total_amount }}</strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Buttons -->
     <div class="buttons">
-        <button onclick="printInvoice()">Print Invoice</button>
+        <button onclick="window.print()">Print Invoice</button>
     </div>
 
     <!-- Footer -->
