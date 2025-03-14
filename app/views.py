@@ -245,7 +245,7 @@ def invoice_list(request):
 
 def invoice_detail(request, invoice_id):
     invoice = get_object_or_404(Invoice, id=invoice_id)
-    items = InvoiceItem.objects.filter(invoice=invoice)
+    items = InvoiceItem.objects.filter(invoice=invoice).order_by('price')
     total_qty = sum(item.quantity for item in items if item.product) 
     subtotal = sum(item.quantity * item.price for item in items)
     discount_amount = (subtotal * invoice.discount_percentage) / 100 if invoice.discount_percentage else 0
