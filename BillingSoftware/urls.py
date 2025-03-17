@@ -77,6 +77,8 @@ urlpatterns = [
     path('factorysalelist2/',app2.views.factory_sale_list2, name='factorysalelist2'),
     path('factorysale/delete2/<int:sale_id>/',app2.views.delete_factory_sale2, name='delete_factory_sale2'),
     path('adminhome2/', app2.views.adminhome2, name='adminhome2'),
+    
+
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

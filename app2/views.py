@@ -229,12 +229,8 @@ def createinvoice2(request):
     })
 
 def invoice_list2(request):
-    invoices = Invoice2.objects.all().order_by('-date')
-    paginator = Paginator(invoices, 10)  # Paginate with 10 invoices per page
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    return render(request, 'invoice list2.html', {'page_obj': page_obj})
+    invoices = Invoice2.objects.all().order_by('-date','-id')  # Order by date (newest first)
+    return render(request, 'invoice list2.html', {'invoices': invoices})
 
 def invoice_detail2(request, invoice_id):
     invoice = get_object_or_404(Invoice2, id=invoice_id)
