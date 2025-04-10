@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.http import HttpResponse, JsonResponse
-from .models import Product2, Production2, ProductionHistory2, Invoice2, InvoiceItem2, reg2, login2,Factorysale2
-from .forms import ProductionForm2, ProductForm2, InvoiceForm2,FactorySaleForm2
+from .models import Product2, Production2, ProductionHistory2, Invoice2, InvoiceItem2, reg2, login2,Factorysale2,Customer2
+from .forms import ProductionForm2, ProductForm2, InvoiceForm2,FactorySaleForm2,Customer2Form,MoneyUpdateForm
 from django.db import transaction,IntegrityError
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -105,7 +105,36 @@ def createinvoice2(request):
             try:
                 with transaction.atomic():
                     invoice = invoice_form.save(commit=False)
-                    invoice.invoice_number = ""  # Temporary invoice number
+                    invoice.invoice_number = ""  # Temporary placeholder
+
+                    # Set manually entered customer name (not FK)
+                    customer_name = request.POST.get("customer")
+                    invoice.customer = customer_name
+
+                    # Handle ForeignKey for location
+                    location = request.POST.get("location")
+                    if location:
+                        try:
+                            invoice.location = Customer2.objects.get(id=location)
+                        except Customer2.DoesNotExist:
+                            messages.error(request, "Selected location is invalid.")
+                            return redirect('createinvoice2')
+
+                    invoice.save()
+
+                    # Generate invoice number based on last entry
+                    last_invoice = Invoice2.objects.order_by('-id').first()
+                    if last_invoice and last_invoice.invoice_number:
+                        match = re.search(r'INV2-(\d+)', last_invoice.invoice_number)
+                        if match:
+                            last_number = int(match.group(1))
+                            new_number = last_number + 1
+                        else:
+                            new_number = 1
+                    else:
+                        new_number = 1
+
+                    invoice.invoice_number = f"INV2-{new_number:05d}"
                     invoice.save()
 
                     products = request.POST.getlist('products[]')
@@ -113,9 +142,8 @@ def createinvoice2(request):
                     accessory_quantities = request.POST.getlist('accessory_quantity')
                     accessory_prices = request.POST.getlist('accessory_price')
                     e_way = request.POST.get('e_way', "0")
-                    sp_discount = request.POST.get("sp_discount","0")
+                    sp_discount = request.POST.get("sp_discount", "0")
 
-                    # Convert e_way to Decimal
                     try:
                         e_way = Decimal(str(e_way).strip()) if e_way.strip() else Decimal(0)
                     except ValueError:
@@ -131,13 +159,13 @@ def createinvoice2(request):
 
                     if not any(products) and not any(accessory_prices):
                         messages.error(request, "Please add at least one product or accessory.")
+                        invoice.delete()
                         return redirect('createinvoice2')
 
-                    product_total = Decimal(0)  
-                    accessory_total = Decimal(0)  
-                    valid_items = 0  
+                    product_total = Decimal(0)
+                    accessory_total = Decimal(0)
+                    valid_items = 0
 
-                    # Process products
                     for i in range(len(products)):
                         try:
                             product_id = products[i].strip()
@@ -149,7 +177,7 @@ def createinvoice2(request):
                                 if product.quantity >= quantity:
                                     price = Decimal(str(product.price))
                                     subtotal = price * quantity
-                                    product_total += subtotal  
+                                    product_total += subtotal
 
                                     InvoiceItem2.objects.create(
                                         invoice=invoice,
@@ -158,7 +186,7 @@ def createinvoice2(request):
                                         price=price,
                                         subtotal=subtotal
                                     )
-                                    product.quantity -= quantity  
+                                    product.quantity -= quantity
                                     product.save()
                                     valid_items += 1
                                 else:
@@ -169,7 +197,6 @@ def createinvoice2(request):
                             invoice.delete()
                             return redirect('createinvoice2')
 
-                    # Process accessories
                     for j in range(len(accessory_prices)):
                         try:
                             accessory_price = Decimal(str(accessory_prices[j]).strip()) if accessory_prices[j].strip() else Decimal(0)
@@ -177,11 +204,11 @@ def createinvoice2(request):
 
                             if accessory_price > 0 and accessory_quantity > 0:
                                 subtotal = accessory_price
-                                accessory_total += subtotal  
+                                accessory_total += subtotal
 
                                 InvoiceItem2.objects.create(
                                     invoice=invoice,
-                                    product=None,  # No product for accessories
+                                    product=None,
                                     quantity=accessory_quantity,
                                     price=accessory_price,
                                     subtotal=subtotal
@@ -194,24 +221,18 @@ def createinvoice2(request):
                             return redirect('createinvoice2')
 
                     if valid_items == 0:
-                        invoice.delete()  
+                        invoice.delete()
                         messages.error(request, "No valid items to create an invoice.")
                         return redirect('createinvoice2')
 
-                    # Apply discount ONLY to product total
                     discount_percentage = Decimal(str(invoice.discount_percentage or 0))
                     discount_amount = (product_total * discount_percentage) / Decimal(100)
                     final_product_total = product_total - discount_amount
 
-                    # Final amount calculation with Decimal
                     final_amount = final_product_total + accessory_total + e_way - sp_discount
 
-                    # Debugging print statements
-                    print(f"Product Total: {product_total}, Discount Amount: {discount_amount}, Final Product Total: {final_product_total}")
-                    print(f"Accessory Total: {accessory_total}, Transport Charge (e_way): {e_way}, Final Amount: {final_amount}")
-
                     invoice.total_amount = final_amount
-                    invoice.e_way = e_way  
+                    invoice.e_way = e_way
                     invoice.save()
 
                     messages.success(request, f"Invoice {invoice.invoice_number} created successfully!")
@@ -223,10 +244,14 @@ def createinvoice2(request):
                 messages.error(request, f"An unexpected error occurred: {e}")
 
     products = Product2.objects.all().order_by('price')
-    return render(request, 'create invoice2.html', {  
+    location = Customer2.objects.all()  
+    return render(request, 'create invoice2.html', {
         'invoice_form': invoice_form,
         'products': products,
+        'locations': location, 
     })
+
+
 
 def invoice_list2(request):
     invoices = Invoice2.objects.all().order_by('-date','-id')  # Order by date (newest first)
@@ -359,7 +384,6 @@ def delete_invoice2(request, invoice_id):
 
     return HttpResponseNotAllowed(['POST']) 
 
-
 def adminhome2(request):
     template = loader.get_template("adminhome2.html")
     context = {}
@@ -468,9 +492,13 @@ def edit_invoice2(request, invoice_id):
             customer = request.POST.get("customer", invoice.customer)
             date = request.POST.get("date", invoice.date)
             discount_percentage = request.POST.get("discount_percentage", invoice.discount_percentage)
+            accessory_price = request.POST.get("accessory_price", invoice.accessory_price)
+            e_way = request.POST.get("e_way", invoice.e_way)
 
-            # Convert discount percentage to Decimal
+            # Convert to Decimal
             discount_percentage = Decimal(discount_percentage) if discount_percentage else Decimal(0)
+            accessory_price = Decimal(accessory_price) if accessory_price else Decimal(0)
+            e_way = Decimal(e_way) if e_way else Decimal(0)
 
             product_ids = request.POST.getlist("products[]")
             quantities = request.POST.getlist("quantities[]")
@@ -487,7 +515,7 @@ def edit_invoice2(request, invoice_id):
                     item.product.quantity += item.quantity
                     item.product.save()
 
-            # ✅ Clear existing invoice items (excluding accessory items)
+            # ✅ Clear existing invoice items
             invoice.invoice_items.all().delete()
 
             # ✅ Process new items
@@ -531,14 +559,17 @@ def edit_invoice2(request, invoice_id):
             discount_amount = (product_total * discount_percentage) / Decimal(100)
             final_product_total = product_total - discount_amount
 
-            # ✅ Final total = product total after discount + fixed accessory and e-way charges
-            final_amount = final_product_total + invoice.accessory_price + invoice.e_way - invoice.sp_discount
-
             # ✅ Update invoice details
             invoice.customer = customer
             invoice.date = date
             invoice.discount_percentage = discount_percentage
+            invoice.accessory_price = accessory_price
+            invoice.e_way = e_way
+
+            # ✅ Final total = discounted product total + accessory + e-way - special discount
+            final_amount = final_product_total + accessory_price + e_way - invoice.sp_discount
             invoice.total_amount = final_amount
+
             invoice.save()
 
             if skipped_items:
@@ -561,6 +592,8 @@ def edit_invoice2(request, invoice_id):
         "customer": str(invoice.customer),
         "date": invoice.date.strftime("%Y-%m-%d"),
         "discount": float(invoice.discount_percentage) if invoice.discount_percentage else 0.0,
+        "accessory_price": float(invoice.accessory_price),
+        "e_way": float(invoice.e_way),
         "total": float(invoice.total_amount) if invoice.total_amount else 0.0,
         "items": [
             {
@@ -603,3 +636,101 @@ def delete_factory_sale2(request, sale_id):
     sale.delete()
     messages.success(request, "Factory Sale deleted successfully!")
     return redirect('factorysalelist2')
+
+def addcustomer2(request):
+    if request.method == 'POST':
+        form = Customer2Form(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('viewcustomer2') 
+    else:
+        form = Customer2Form()
+    return render(request, 'Add_customer.html', {'form': form})
+
+def customer2_list(request):
+    customers = Customer2.objects.all()
+    return render(request, 'customer_list.html',{'customers': customers})
+
+
+
+def location_report2(request):
+    location_id = request.GET.get('location')
+    invoices = Invoice2.objects.all()
+
+    if location_id:
+        invoices = invoices.filter(location__id=location_id)
+
+    total_sales = invoices.aggregate(total=Sum('total_amount'))['total'] or 0
+    total_balance = invoices.aggregate(total=Sum('balance_amount'))['total'] or 0
+    total_balance = invoices.aggregate(total=Sum('balance_amount'))['total'] or 0
+
+    if request.method == 'POST':
+        count = int(request.POST.get('invoice_count', 0))
+        for i in range(1, count + 1):
+            invoice_id = request.POST.get(f'invoice_id_{i}')
+            money_got = request.POST.get(f'money_got_{i}')
+
+            if invoice_id:
+                try:
+                    money_got = int(money_got or 0)
+                    invoice = Invoice2.objects.get(id=invoice_id)
+                    invoice.money_got = money_got
+                    invoice.balance_amount = invoice.total_amount - money_got
+                    invoice.save()
+                except (Invoice2.DoesNotExist, ValueError, TypeError):
+                    continue  # Skip any row that causes an error
+
+        return redirect(request.path + f"?location={location_id}" if location_id else request.path)
+
+    context = {
+        'locations': Customer2.objects.all(),
+        'selected_location_id': int(location_id) if location_id else '',
+        'invoices': invoices,
+        'total_sales': total_sales,
+        'total_balance': total_balance,
+    }
+    return render(request, 'location_report.html', context)
+
+
+import openpyxl
+from openpyxl.utils import get_column_letter
+from django.http import HttpResponse
+from .models import Invoice2
+
+def export_invoices_to_excel2(request):
+    location_id = request.GET.get('location')
+    invoices = Invoice2.objects.all()
+
+    if location_id:
+        invoices = invoices.filter(location__id=location_id)
+
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.title = 'Invoices'
+
+    headers = [
+        'Invoice No', 'Date', 'Customer', 'Location',
+        'Total Amount', 'Money Got', 'Balance Amount'
+    ]
+    sheet.append(headers)
+
+    for invoice in invoices:
+        sheet.append([
+            invoice.invoice_number,
+            invoice.date.strftime('%Y-%m-%d'),
+            str(invoice.customer),
+            str(invoice.location),
+            float(invoice.total_amount),
+            float(invoice.money_got),
+            float(invoice.balance_amount),
+        ])
+
+    # Auto-adjust column widths
+    for column_cells in sheet.columns:
+        length = max(len(str(cell.value)) for cell in column_cells)
+        sheet.column_dimensions[get_column_letter(column_cells[0].column)].width = length + 3
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=location_wise_invoices.xlsx'
+    workbook.save(response)
+    return response

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Invoice2,reg2,ProductionHistory2,Product2,InvoiceItem2,login2,Production2,Factorysale2
+from .models import Invoice2,reg2,ProductionHistory2,Product2,InvoiceItem2,login2,Production2,Factorysale2,Customer2
 
 # Register your models here.
     
@@ -32,3 +32,7 @@ class productionhitoryAdmin(admin.ModelAdmin):
 @admin.register(Factorysale2)
 class FactorysaleAdmin(admin.ModelAdmin):
     list_display=('flavor', 'quantity', 'total_amount','date')
+
+@admin.register(Customer2)
+class CustomerAdmin(admin.ModelAdmin):
+    list_display=('name', 'state')

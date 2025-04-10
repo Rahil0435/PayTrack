@@ -189,22 +189,25 @@
         .alert button:hover {
             opacity: 0.7;
         }
-        #bn{
+
+        #bn {
             background-color: #007BFF;
             width: 160px;
             height: 35px;
         }
-        a{
+
+        a {
             color: white;
             text-decoration: none;
         }
+
     </style>
     <script>
         function addRow() {
-    const table = document.getElementById('productTable').getElementsByTagName('tbody')[0];
-    const row = table.insertRow();
+            const table = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+            const row = table.insertRow();
 
-    row.innerHTML = `
+            row.innerHTML = `
         <td>
             <select name="products[]" class="product-select" onchange="updatePrice(this)">
                 <option value="" disabled selected>Select a product</option>
@@ -220,70 +223,70 @@
         <td class="subtotal-cell">0</td>
         <td><button type="button" onclick="removeRow(this)">Remove</button></td>
     `;
-}
+        }
 
-function removeRow(button) {
-    const row = button.closest('tr');
-    row.remove();
-    updateTotal();
-}
+        function removeRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+            updateTotal();
+        }
 
-function updatePrice(select) {
-    const row = select.closest('tr');
-    const priceCell = row.querySelector('.price-cell');
-    const selectedOption = select.options[select.selectedIndex];
-    
-    if (selectedOption) {
-        const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
-        priceCell.textContent = price.toFixed(2);
-    }
-    updateSubtotal(select);
-}
+        function updatePrice(select) {
+            const row = select.closest('tr');
+            const priceCell = row.querySelector('.price-cell');
+            const selectedOption = select.options[select.selectedIndex];
 
-function updateSubtotal(input) {
-    const row = input.closest('tr');
-    const quantity = Math.max(parseInt(row.querySelector('.quantity-input').value) || 1, 1);
-    row.querySelector('.quantity-input').value = quantity; // Prevent negative values
+            if (selectedOption) {
+                const price = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+                priceCell.textContent = price.toFixed(2);
+            }
+            updateSubtotal(select);
+        }
 
-    const price = parseFloat(row.querySelector('.price-cell').textContent) || 0;
-    const subtotalCell = row.querySelector('.subtotal-cell');
-    subtotalCell.textContent = (quantity * price).toFixed(2);
-    
-    updateTotal();
-}
+        function updateSubtotal(input) {
+            const row = input.closest('tr');
+            const quantity = Math.max(parseInt(row.querySelector('.quantity-input').value) || 1, 1);
+            row.querySelector('.quantity-input').value = quantity; // Prevent negative values
 
-function updateTotal() {
-    let total = 0;
-    document.querySelectorAll('.subtotal-cell').forEach(cell => {
-        total += parseFloat(cell.textContent) || 0;
-    });
+            const price = parseFloat(row.querySelector('.price-cell').textContent) || 0;
+            const subtotalCell = row.querySelector('.subtotal-cell');
+            subtotalCell.textContent = (quantity * price).toFixed(2);
 
-    let discountPercentage = Math.max(parseFloat(document.getElementById('discountInput').value) || 0, 0);
-    discountPercentage = Math.min(discountPercentage, 100); // Ensure max 100%
-    document.getElementById('discountInput').value = discountPercentage;
+            updateTotal();
+        }
 
-    let discountAmount = (total * discountPercentage) / 100;
-    let finalTotal = total - discountAmount;
+        function updateTotal() {
+            let total = 0;
+            document.querySelectorAll('.subtotal-cell').forEach(cell => {
+                total += parseFloat(cell.textContent) || 0;
+            });
 
-    let accessoryAmount = Math.max(parseFloat(document.getElementById('accessoryAmount').value) || 0, 0);
-    let eWayAmount = Math.max(parseFloat(document.getElementById('e_way').value) || 0, 0);
-    let SP_discount = Math.max(parseFloat(document.getElementById('sp_discount').value) || 0, 0);
+            let discountPercentage = Math.max(parseFloat(document.getElementById('discountInput').value) || 0, 0);
+            discountPercentage = Math.min(discountPercentage, 100); // Ensure max 100%
+            document.getElementById('discountInput').value = discountPercentage;
 
-    finalTotal += accessoryAmount + eWayAmount - SP_discount;
-    finalTotal = Math.max(finalTotal, 0); // Ensure no negative total
+            let discountAmount = (total * discountPercentage) / 100;
+            let finalTotal = total - discountAmount;
 
-    document.getElementById('totalAmount').textContent = finalTotal.toFixed(2);
-}
+            let accessoryAmount = Math.max(parseFloat(document.getElementById('accessoryAmount').value) || 0, 0);
+            let eWayAmount = Math.max(parseFloat(document.getElementById('e_way').value) || 0, 0);
+            let SP_discount = Math.max(parseFloat(document.getElementById('sp_discount').value) || 0, 0);
 
-window.onload = function () {
-    document.querySelector('input[name="date"]').value = new Date().toISOString().split('T')[0];
-};
+            finalTotal += accessoryAmount + eWayAmount - SP_discount;
+            finalTotal = Math.max(finalTotal, 0); // Ensure no negative total
+
+            document.getElementById('totalAmount').textContent = finalTotal.toFixed(2);
+        }
+
+        window.onload = function () {
+            document.querySelector('input[name="date"]').value = new Date().toISOString().split('T')[0];
+        };
 
     </script>
 </head>
 
 <body>
-    <button id="bn"><a href="{% url 'userhome2' %}"> Home</a></button>  
+    <button id="bn"><a href="{% url 'userhome2' %}"> Home</a></button>
     <div class="container">
 
         {% if messages %}
@@ -312,6 +315,17 @@ window.onload = function () {
             {{ form.as_p }}
             <table>
                 <tr>
+                    <th>Location</th>
+                    <td>
+                        <select name="location" id="location" required>
+                            <option value="">-- Select Location --</option>
+                            {% for loc in locations %}
+                                <option value="{{ loc.id }}">{{ loc.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                <tr>
                     <th>Customer</th>
                     <td><input type="text" name="customer" required></td>
                 </tr>
@@ -321,10 +335,11 @@ window.onload = function () {
                 </tr>
                 <tr>
                     <th>Discount (%)</th>
-                    <td><input type="number" name="discount_percentage" id="discountInput" value="0" min="0" max="100" oninput="updateTotal()"></td>
+                    <td><input type="number" name="discount_percentage" id="discountInput" value="0" min="0" max="100"
+                            oninput="updateTotal()"></td>
                 </tr>
             </table>
-        
+
             <button type="button" class="add-row-btn" onclick="addRow()">Add Product</button>
             <table id="productTable">
                 <thead>
@@ -343,11 +358,13 @@ window.onload = function () {
             <table>
                 <tr>
                     <th>Accessory Quantity</th>
-                    <td><input type="number" id="accessoryQuantity" name="accessory_quantity" value="0" min="0" oninput="updateTotal()"></td>
+                    <td><input type="number" id="accessoryQuantity" name="accessory_quantity" value="0" min="0"
+                            oninput="updateTotal()"></td>
                 </tr>
                 <tr>
                     <th>Accessory Amount</th>
-                    <td><input type="number" id="accessoryAmount" name="accessory_price" value="0" min="0" oninput="updateTotal()"></td>
+                    <td><input type="number" id="accessoryAmount" name="accessory_price" value="0" min="0"
+                            oninput="updateTotal()"></td>
                 </tr>
                 <tr>
                     <th>E-way</th>
@@ -355,10 +372,11 @@ window.onload = function () {
                 </tr>
                 <tr>
                     <th>sp_discount</th>
-                    <td><input type="number" id="sp_discount" name="sp_discount" value="0" min="0" oninput="updateTotal()"></td>
+                    <td><input type="number" id="sp_discount" name="sp_discount" value="0" min="0"
+                            oninput="updateTotal()"></td>
                 </tr>
             </table>
-        
+
             <div class="invoice-footer">
                 <div class="total">
                     Total Amount: ₹<span id="totalAmount">0.00</span>
@@ -366,5 +384,3 @@ window.onload = function () {
                 <button type="submit" id="submitInvoice">Create Invoice</button>
             </div>
         </form>
-        
-       

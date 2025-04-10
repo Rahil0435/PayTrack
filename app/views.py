@@ -133,7 +133,7 @@ def createinvoice(request):
                         sp_discount = Decimal(str(sp_discount).strip()) if sp_discount.strip() else Decimal(0)
                     except InvalidOperation:
                         messages.error(request, "Invalid special discount entered.")
-                        return redirect('createinvoice2')
+                        return redirect('createinvoice')
 
                     if not any(products) and not any(accessory_prices):
                         messages.error(request, "Please add at least one product or accessory.")
@@ -174,7 +174,7 @@ def createinvoice(request):
                         except (ValueError, Product.DoesNotExist) as e:
                             messages.error(request, f"Invalid product selection: {e}")
                             invoice.delete()
-                            return redirect('createinvoice2')
+                            return redirect('createinvoice')
 
                     # Process accessories
                     for j in range(len(accessory_prices)):

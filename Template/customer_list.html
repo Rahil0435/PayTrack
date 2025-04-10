@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer List</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f0f2f5;
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .home-btn {
+            margin-bottom: 20px;
+        }
+
+        .home-btn button {
+            background-color: #007BFF;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+
+        .home-btn button:hover {
+            background-color: #0056b3;
+        }
+
+        .home-btn a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #007bff;
+            margin: 0;
+        }
+
+        .add-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .add-btn:hover {
+            background-color: #0056b3;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            background-color: #f9fafb;
+            margin-bottom: 10px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        li:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .serial {
+            font-weight: bold;
+            color: #007bff;
+            margin-right: 15px;
+            width: 30px;
+            text-align: right;
+        }
+
+        .details {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="home-btn">
+        <button><a href="{% url 'userhome2' %}">Home</a></button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h2>Customer List</h2>
+            <a href="{% url 'addcustomer2' %}" class="add-btn">+ Add Customer</a>
+        </div>
+        <ul>
+            {% for customer in customers %}
+                <li>
+                    <span class="serial">{{ forloop.counter }}.</span>
+                    <span class="details"><strong>{{ customer.name }}</strong> — {{ customer.state }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

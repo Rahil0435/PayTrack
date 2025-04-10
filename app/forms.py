@@ -69,6 +69,3 @@ class FactorySaleForm(forms.ModelForm):
     class Meta:
         model = Factorysale
         fields = ['flavor', 'quantity', 'total_amount']
-        widgets = {
-         'quantity': forms.NumberInput(attrs={'min': 1, 'class': 'quantity-input'}),
-     }

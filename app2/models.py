@@ -29,10 +29,18 @@ class ProductionHistory2(models.Model):
     def __str__(self):
         return f"{self.product.name} - {self.quantity_produced} on {self.date}"
 
+class Customer2(models.Model):
+    name = models.CharField(max_length=100)
+    state = models.CharField(max_length=100,blank=True)
+
+    def __str__(self):
+        return self.name
+    
 
 class Invoice2(models.Model):
     date = models.DateField()
-    customer = models.CharField(max_length=30, default="Unknown Customer")
+    customer = models.CharField(max_length=100) 
+    location = models.ForeignKey(Customer2, on_delete=models.SET_NULL, null=True, blank=True)
     invoice_number = models.CharField(max_length=20, unique=True, blank=True)  # Allow blank to generate in save()
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -40,6 +48,8 @@ class Invoice2(models.Model):
     accessory_price= models.IntegerField(default=0)
     e_way = models.IntegerField(default=0)
     sp_discount =models.IntegerField(default=0)
+    money_got = models.IntegerField(default=0)
+    balance_amount = models.IntegerField(default=0)
 
     def final_amount(self):
         discount_amount = (self.total_amount - self.accessory_price) * (self.discount_percentage / 100)
@@ -59,6 +69,10 @@ class Invoice2(models.Model):
 
     def __str__(self):
         return self.invoice_number
+    
+    def save(self, *args, **kwargs):
+        self.balance_amount = self.total_amount - self.money_got
+        super().save(*args, **kwargs)
 
 class InvoiceItem2(models.Model):
     invoice = models.ForeignKey(Invoice2, on_delete=models.CASCADE, related_name='invoice_items')
@@ -89,3 +103,4 @@ class Factorysale2(models.Model):
 
     def __str__(self):
         return f"{self.flavor} - {self.quantity} sold on {self.date}"
+

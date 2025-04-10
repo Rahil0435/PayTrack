@@ -127,6 +127,16 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <table>
+            <tr>
+                <th>Accessory Amount</th>
+                <td><input type="number" name="accessory_price" id="accessory_price" value="{{ invoice.accessory_price }}" min="0" step="0.01" oninput="updateTotal()"></td>
+            </tr>
+            <tr>
+                <th>E-Way</th>
+                <td><input type="number" name="e_way" id="e_way" value="{{ invoice.e_way }}" min="0" step="0.01" oninput="updateTotal()"></td>
+            </tr>
+        </table>
             <div class="invoice-footer">
                 <div class="total">
                     Total Amount: ₹<span id="totalAmount">{{ invoice.total_amount }}</span>

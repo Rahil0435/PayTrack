@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product2,Production2,Invoice2, InvoiceItem2,Factorysale2
+from .models import Product2,Production2,Invoice2, InvoiceItem2,Factorysale2,Customer2
 from django.utils import timezone
 from datetime import timezone
 
@@ -48,12 +48,33 @@ class InvoiceItemForm2(forms.ModelForm):
 
 
 class InvoiceWithItemsForm2(forms.Form):
-    customer = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Customer Name'}))
-    date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}))
-    invoice_number = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'}))
-    discount_percentage = forms.DecimalField(min_value=0, max_value=100, decimal_places=2, widget=forms.NumberInput(attrs={'class': 'form-control'}))
-    products = forms.CharField(widget=forms.HiddenInput(), required=False)  # Store product IDs dynamically
-    quantities = forms.CharField(widget=forms.HiddenInput(), required=False)  # Store quantities dynamically
+    customer = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Customer Name'})
+    )
+    
+    location = forms.ModelChoiceField(
+        queryset=Customer2.objects.all(),
+        empty_label="Select Location"
+    )
+    date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+    )
+
+    invoice_number = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'})
+    )
+
+    discount_percentage = forms.DecimalField(
+        min_value=0,
+        max_value=100,
+        decimal_places=2,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+
+    products = forms.CharField(widget=forms.HiddenInput(), required=False)
+    quantities = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -72,3 +93,20 @@ class FactorySaleForm2(forms.ModelForm):
         widgets = {
          'quantity': forms.NumberInput(attrs={'min': 1, 'class': 'quantity-input'}),
      }
+
+class Customer2Form(forms.ModelForm):
+    class Meta:
+        model = Customer2
+        fields = ['name', 'state']
+
+class MoneyUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Invoice2
+        fields = ['money_got']
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.balance_amount = instance.total_amount - instance.money_got
+        if commit:
+            instance.save()
+        return instance

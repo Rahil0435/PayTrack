@@ -68,15 +68,19 @@ urlpatterns = [
     path('invoice2/<int:invoice_id>/',app2.views.invoice_detail2, name='invoice_detail2'),
     path('logout2/',app2.views.logoutview2, name='logout2'),
     path('invoice2/<int:invoice_id>/pdf/',app2.views.generate_pdf2, name='generate_pdf2'),
-    path('invoice/delete2/<int:invoice_id>/',app2.views.delete_invoice2, name='delete_invoice2'),
+    path('invoice2/delete/<int:invoice_id>/',app2.views.delete_invoice2, name='delete_invoice2'),
     path('salesreport2/',app2.views.sales_report2, name='salesreport2'),
     path('product_sales_report2/',app2.views.product_sales_report2, name='product_sales_report2'),
     path('stock_edit2/',app2.views.stock_edit2, name='stock_edit2'), 
-    path('editinvoice2/<int:invoice_id>/',app2.views.edit_invoice2, name='editinvoice2'), 
+    path('editinvoice2/<int:invoice_id>/',app2.views.edit_invoice2, name='editinvoice2'),
     path('factorysale2/',app2.views.create_factory_sale2, name='factorysale2'),
     path('factorysalelist2/',app2.views.factory_sale_list2, name='factorysalelist2'),
     path('factorysale/delete2/<int:sale_id>/',app2.views.delete_factory_sale2, name='delete_factory_sale2'),
     path('adminhome2/', app2.views.adminhome2, name='adminhome2'),
+    path('addcustomer2/',app2.views.addcustomer2,name='addcustomer2'),
+    path('viewcustomer2/', app2.views.customer2_list,name='viewcustomer2'),
+    path('location_report2/',app2.views.location_report2, name='locationreport2'),
+    path('export-invoices-to-excel2/',app2.views.export_invoices_to_excel2, name='export_invoices_to_excel2'),
     
 
 
