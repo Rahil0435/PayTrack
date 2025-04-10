@@ -104,8 +104,22 @@ def createinvoice2(request):
         if invoice_form.is_valid():
             try:
                 with transaction.atomic():
+                    # Generate invoice number BEFORE saving
+                    last_invoice = Invoice2.objects.order_by('-id').first()
+                    if last_invoice and last_invoice.invoice_number:
+                        match = re.search(r'INV2-(\d+)', last_invoice.invoice_number)
+                        if match:
+                            last_number = int(match.group(1))
+                            new_number = last_number + 1
+                        else:
+                            new_number = 1
+                    else:
+                        new_number = 1
+                    generated_invoice_number = f"INV2-{new_number:05d}"
+
+                    # Save form without committing, assign invoice number
                     invoice = invoice_form.save(commit=False)
-                    invoice.invoice_number = ""  # Temporary placeholder
+                    invoice.invoice_number = generated_invoice_number
 
                     # Set manually entered customer name (not FK)
                     customer_name = request.POST.get("customer")
@@ -120,21 +134,6 @@ def createinvoice2(request):
                             messages.error(request, "Selected location is invalid.")
                             return redirect('createinvoice2')
 
-                    invoice.save()
-
-                    # Generate invoice number based on last entry
-                    last_invoice = Invoice2.objects.order_by('-id').first()
-                    if last_invoice and last_invoice.invoice_number:
-                        match = re.search(r'INV2-(\d+)', last_invoice.invoice_number)
-                        if match:
-                            last_number = int(match.group(1))
-                            new_number = last_number + 1
-                        else:
-                            new_number = 1
-                    else:
-                        new_number = 1
-
-                    invoice.invoice_number = f"INV2-{new_number:05d}"
                     invoice.save()
 
                     products = request.POST.getlist('products[]')
@@ -155,6 +154,7 @@ def createinvoice2(request):
                         sp_discount = Decimal(str(sp_discount).strip()) if sp_discount.strip() else Decimal(0)
                     except InvalidOperation:
                         messages.error(request, "Invalid special discount entered.")
+                        invoice.delete()
                         return redirect('createinvoice2')
 
                     if not any(products) and not any(accessory_prices):
@@ -250,7 +250,6 @@ def createinvoice2(request):
         'products': products,
         'locations': location, 
     })
-
 
 
 def invoice_list2(request):
