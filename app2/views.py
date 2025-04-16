@@ -733,7 +733,7 @@ def location_report2(request):
         'total_got': total_got,
     }
 
-    return render(request, 'location_report.html', context)
+    return render(request, 'location_report2.html', context)
 
 
 
@@ -785,7 +785,7 @@ from django.utils import timezone
 from django.db.models import Sum
 from .models import PaymentRecord2, Invoice2
 
-def transaction_report(request):
+def transaction_report2(request):
     # Get the filter parameters from the request
     start_date = request.GET.get('start_date', '')
     end_date = request.GET.get('end_date', '')
@@ -822,7 +822,7 @@ def transaction_report(request):
     return render(request, 'transaction_report.html', context)
 
 
-def delete_transaction(request, payment_id):
+def delete_transaction2(request, payment_id):
     # Get the payment record or return 404 if not found
     payment = get_object_or_404(PaymentRecord2, pk=payment_id)
 

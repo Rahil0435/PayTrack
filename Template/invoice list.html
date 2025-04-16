@@ -14,7 +14,7 @@
         }
     
         .container {
-            max-width: 1000px;
+            max-width: auto;
             margin: 40px auto;
             padding: 30px;
             background-color: #fff;
@@ -160,6 +160,7 @@
                     <th>Invoice Number</th>
                     <th>Date</th>
                     <th>Customer</th>
+                    <th>Location</th>
                     <th>Total Amount</th>
                     <th>Actions</th>
                 </tr>
@@ -171,6 +172,7 @@
                     <td>{{ invoice.invoice_number }}</td>
                     <td>{{ invoice.date }}</td>
                     <td>{{ invoice.customer }}</td>
+                    <td>{{ invoice.location }}</td>
                     <td>₹{{ invoice.total_amount }}</td>
                     <td>
                         <a href="{% url 'invoice_detail' invoice.id %}">View</a> |

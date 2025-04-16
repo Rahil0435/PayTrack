@@ -189,6 +189,8 @@
                     <a href="{% url 'invoicelist' %}">Invoice List</a>
                     <a href="{% url 'productlist' %}">Stock List</a>
                     <a href="{% url 'factorysalelist' %}"> Factory sale list</a>
+                    <a href="{% url 'viewcustomer' %}">Customer list</a>
+                    <a href="{% url 'locationreport' %}">Customer Report</a>
                 </div>
             </li>
             <li><a href="{% url 'logout' %}">Logout</a></li>
@@ -204,6 +206,7 @@
             <a href="{% url 'stock_edit' %}" class="button">Stock Edit </a>
             <a href="{% url 'factorysale' %}" class="button">Add Factory sale</a>
             <a href="{% url 'productionhistory' %}" class="button">Production History</a>
+            <a href="{% url 'addcustomer' %}" class="button">Add Customer</a>
         </div>
     </div>
 

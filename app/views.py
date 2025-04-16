@@ -19,6 +19,8 @@ from django.views.decorators.cache import never_cache
 from django.utils.timezone import now
 from django.db.models import Sum,F
 from decimal import Decimal,InvalidOperation
+from datetime import datetime, date
+from django.utils import timezone
 
 
 
@@ -242,7 +244,7 @@ def createinvoice(request):
                     invoice.save()
 
                     messages.success(request, f"Invoice {invoice.invoice_number} created successfully!")
-                    return redirect('invoicelist2')
+                    return redirect('invoicelist')
 
             except IntegrityError as e:
                 messages.error(request, f"Invoice creation failed due to a system error: {e}")
@@ -251,7 +253,7 @@ def createinvoice(request):
 
     products = Product.objects.all().order_by('price')
     location = Customer.objects.all()  
-    return render(request, 'create invoice2.html', {
+    return render(request, 'create invoice.html', {
         'invoice_form': invoice_form,
         'products': products,
         'locations': location, 
@@ -659,75 +661,80 @@ def customer2_list(request):
     return render(request, 'customer_list2.html',{'customers': customers})
 
 def location_report(request):
-    # Extract location_id from GET parameters
     location_id = request.GET.get('location')
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
 
-    # Filter invoices based on location if provided
-    invoices = Invoice.objects.all()
+    # Set default dates to today's date if not provided
+    today = date.today()
+    if not start_date:
+        start_date = today.strftime('%Y-%m-%d')
+    if not end_date:
+        end_date = today.strftime('%Y-%m-%d')
 
-    # Filter by location
+    # Filter invoices
+    invoices = Invoice.objects.all()
     if location_id:
         invoices = invoices.filter(location__id=location_id)
 
-    # Filter by date range if both dates are provided
-    if start_date and end_date:
-        try:
-            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
-            invoices = invoices.filter(date__gte=start_date, date__lte=end_date)
-        except ValueError:
-            # Handle invalid date format (optional)
-            pass
+    # Parse dates and filter invoice date range
+    try:
+        parsed_start = datetime.strptime(start_date, "%Y-%m-%d").date()
+        parsed_end = datetime.strptime(end_date, "%Y-%m-%d").date()
+        invoices = invoices.filter(date__gte=parsed_start, date__lte=parsed_end)
+    except ValueError:
+        pass  # Optional: handle date parsing errors
 
-    # Use aggregate to calculate totals (Sum defaults to None, hence the or 0 fallback)
+    # Totals
     total_sales = invoices.aggregate(total=Sum('total_amount'))['total'] or Decimal('0')
-    total_balance = invoices.aggregate(total=Sum('balance_amount'))['total'] or Decimal('0')
+    raw_total_balance = invoices.aggregate(total=Sum('balance_amount'))['total'] or Decimal('0')
+    if raw_total_balance < 0:
+        display_total_balance = f"+{abs(raw_total_balance)}"
+    else:
+        display_total_balance = str(raw_total_balance)
     total_got = invoices.aggregate(total=Sum('money_got'))['total'] or Decimal('0')
 
-    # Handle POST request to update invoice payments
+    # Handle POST
     if request.method == 'POST':
-        print(request.POST)  # Debug: Log the POST data to ensure correct submission
-
         count = int(request.POST.get('invoice_count', 0))
         for i in range(1, count + 1):
             invoice_id = request.POST.get(f'invoice_id_{i}')
             money_got = request.POST.get(f'money_got_{i}')
-
-            print(f"Invoice ID: {invoice_id}, Money Got: {money_got}")  # Debug: Log values
-
             if invoice_id:
                 try:
                     invoice = Invoice.objects.get(id=invoice_id)
                     added_amount = Decimal(money_got or '0')
-
-                    if added_amount > Decimal('0'):
-                        # Add the entered amount to the current "money_got"
+                    if added_amount > 0:
                         if invoice.original_money_got is None:
                             invoice.original_money_got = invoice.money_got
-
                         invoice.money_got += added_amount
                         invoice.balance_amount = invoice.total_amount - invoice.money_got
                         invoice.save()
-                        print(f"Invoice {invoice.id} updated with money_got: {invoice.money_got}, balance_amount: {invoice.balance_amount}")  # Debug
 
-                        # Create a new payment record for the amount entered
+                        # Record the payment
                         PaymentRecord.objects.create(
                             invoice=invoice,
                             amount=added_amount,
                             date=timezone.now().date(),
                         )
-                        print(f"Payment record created for invoice {invoice.id} with amount: {added_amount}")  # Debug
-
                 except (Invoice.DoesNotExist, ValueError, TypeError) as e:
-                    print(f"Error while processing invoice {invoice_id}: {e}")
+                    print(f"Error processing invoice {invoice_id}: {e}")
                     continue
 
-        # Redirect back to the same page with location filter and date range if present
-        return redirect(request.path + f"?location={location_id}&start_date={start_date}&end_date={end_date}" if location_id and start_date and end_date else request.path)
+        # Redirect to refresh
+        return redirect(
+            f"{request.path}?location={location_id}&start_date={start_date}&end_date={end_date}"
+            if location_id else request.path
+        )
 
-    # Prepare the context for rendering the report
+    # Add formatted balance for display
+    for invoice in invoices:
+        if invoice.balance_amount < 0:
+            invoice.display_balance_amount = f"+{abs(invoice.balance_amount)}"
+        else:
+            invoice.display_balance_amount = str(invoice.balance_amount)
+
+    # Render
     context = {
         'locations': Customer.objects.all(),
         'selected_location_id': int(location_id) if location_id else '',
@@ -735,16 +742,14 @@ def location_report(request):
         'selected_end_date': end_date,
         'invoices': invoices,
         'total_sales': total_sales,
-        'total_balance': total_balance,
+        'total_balance': raw_total_balance,
+        'display_total_balance': display_total_balance,
         'total_got': total_got,
     }
-
     return render(request, 'location_report2.html', context)
 
 import openpyxl
 from openpyxl.utils import get_column_letter
-from django.http import HttpResponse
-from .models import Invoice2
 
 def export_invoices_to_excel(request):
     location_id = request.GET.get('location')
@@ -787,19 +792,19 @@ def export_invoices_to_excel(request):
 from django.utils import timezone
 
 from django.db.models import Sum
-from .models import PaymentRecord2, Invoice2
 
-def transaction_report2(request):
+
+def transaction_report(request):
     # Get the filter parameters from the request
     start_date = request.GET.get('start_date', '')
     end_date = request.GET.get('end_date', '')
     selected_location = request.GET.get('location', '')
 
     # Get distinct locations from Invoice2
-    locations = Customer.objects.filter(invoice2__isnull=False).distinct()
+    locations = Customer.objects.filter(invoice__isnull=False).distinct()
 
     # Start with all payments
-    payments = PaymentRecord2.objects.select_related('invoice')
+    payments = PaymentRecord.objects.select_related('invoice')
 
     # Filter by date
     if start_date:
@@ -825,7 +830,7 @@ def transaction_report2(request):
 
     return render(request, 'transaction_report2.html', context)
 
-def delete_transaction2(request, payment_id):
+def delete_transaction(request, payment_id):
     # Get the payment record or return 404 if not found
     payment = get_object_or_404(PaymentRecord, pk=payment_id)
 
@@ -837,7 +842,7 @@ def delete_transaction2(request, payment_id):
     end_date = request.GET.get('end_date')
 
     # Build the redirect URL, including the filter parameters if present
-    redirect_url = 'transaction_report2'
+    redirect_url = 'transaction_report'
     if start_date and end_date:
         redirect_url += f"?start_date={start_date}&end_date={end_date}"
 
