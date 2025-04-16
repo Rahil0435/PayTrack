@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product,Production,Invoice, InvoiceItem,Factorysale
+from .models import Product,Production,Invoice, InvoiceItem,Factorysale,Customer
 from django.utils import timezone
 from datetime import timezone
 
@@ -69,3 +69,20 @@ class FactorySaleForm(forms.ModelForm):
     class Meta:
         model = Factorysale
         fields = ['flavor', 'quantity', 'total_amount']
+
+class CustomerForm(forms.ModelForm):
+    class Meta:
+        model = Customer
+        fields = ['name', 'state']
+
+class MoneyUpdateForm2(forms.ModelForm):
+    class Meta:
+        model = Invoice
+        fields = ['money_got']
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.balance_amount = instance.total_amount - instance.money_got
+        if commit:
+            instance.save()
+        return instance

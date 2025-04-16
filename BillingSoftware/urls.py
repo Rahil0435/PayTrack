@@ -54,6 +54,12 @@ urlpatterns = [
     path('factorysale/',app.views.create_factory_sale, name='factorysale'),
     path('factorysalelist/',app.views.factory_sale_list, name='factorysalelist'),
     path('factorysale/delete/<int:sale_id>/',app.views.delete_factory_sale, name='delete_factory_sale'),
+    path('addcustomer/',app.views.addcustomer,name='addcustomer'),
+    path('viewcustomer/', app.views.customer2_list,name='viewcustomer'),
+    path('location_report2/',app.views.location_report, name='locationreport'),
+    path('export-invoices-to-excel2/',app.views.export_invoices_to_excel, name='export_invoices_to_excel'),
+    path('transaction_report2/',app.views.transaction_report2, name='transaction_report2'),
+    path('delete_transaction/<int:payment_id>/',app.views.delete_transaction2, name='delete_transaction2'),
     
     path('login2/', app2.views.Login2, name='login2'),
     path('form2/', app2.views.registration2, name='form2'),
@@ -81,6 +87,10 @@ urlpatterns = [
     path('viewcustomer2/', app2.views.customer2_list,name='viewcustomer2'),
     path('location_report2/',app2.views.location_report2, name='locationreport2'),
     path('export-invoices-to-excel2/',app2.views.export_invoices_to_excel2, name='export_invoices_to_excel2'),
+    path('transaction_report/',app2.views.transaction_report, name='transaction_report'),
+    path('delete_transaction/<int:payment_id>/',app2.views.delete_transaction, name='delete_transaction'),
+    # path('undo-money-got/<int:invoice_id>/',app2.views.undo_invoice_money_got, name='undo_invoice_money_got'),
+
     
 
 

@@ -50,6 +50,7 @@ class Invoice2(models.Model):
     sp_discount =models.IntegerField(default=0)
     money_got = models.IntegerField(default=0)
     balance_amount = models.IntegerField(default=0)
+    original_money_got = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def final_amount(self):
         discount_amount = (self.total_amount - self.accessory_price) * (self.discount_percentage / 100)
@@ -65,15 +66,26 @@ class Invoice2(models.Model):
                 new_number = f"INV-{self.date.strftime('%d%m%y')}-001"
             self.invoice_number = new_number
 
+        # Automatically calculate the balance amount
+        self.balance_amount = self.total_amount - self.money_got
+        
+        # Save the instance
         super().save(*args, **kwargs)
+
+    def update_payment_totals(self):
+        """
+        Update the total payment-related fields like balance_amount and money_got
+        after a payment has been made for the invoice.
+        """
+        # Recalculate balance_amount based on the current total_amount and money_got
+        self.balance_amount = self.total_amount - self.money_got
+        
+        # Save the updated invoice
+        self.save()
 
     def __str__(self):
         return self.invoice_number
     
-    def save(self, *args, **kwargs):
-        self.balance_amount = self.total_amount - self.money_got
-        super().save(*args, **kwargs)
-
 class InvoiceItem2(models.Model):
     invoice = models.ForeignKey(Invoice2, on_delete=models.CASCADE, related_name='invoice_items')
     product = models.ForeignKey(Product2, null=True, blank=True, on_delete=models.SET_NULL)
@@ -104,3 +116,15 @@ class Factorysale2(models.Model):
     def __str__(self):
         return f"{self.flavor} - {self.quantity} sold on {self.date}"
 
+class PaymentRecord2(models.Model):
+    invoice = models.ForeignKey(Invoice2, on_delete=models.CASCADE, related_name='payments')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateField(auto_now_add=True)
+    mode = models.CharField(max_length=100, blank=True)  # Optional: UPI/Cash/etc.
+
+    def __str__(self):
+        return f"₹{self.amount} on {self.date} for {self.invoice.invoice_number}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.invoice.update_payment_totals() 

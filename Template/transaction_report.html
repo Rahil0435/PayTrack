@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="date"] {
+            padding: 6px 10px;
+            margin: 0 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button[type="submit"] {
+            padding: 6px 15px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #e8f4fe;
+        }
+
+        .paid {
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .balance-positive {
+            color: red;
+            font-weight: bold;
+        }
+
+        .balance-zero {
+            color: green;
+            font-weight: bold;
+        }
+
+        .money-got {
+            font-weight: bold;
+        }
+
+        .money-got-positive {
+            color: green;
+        }
+
+        .money-got-neutral {
+            color: black;
+        }
+
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+
+        .total-summary {
+            text-align: right;
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'userhome2' %}" class="btn" style="background-color:#007BFF;width:160px;display:inline-block;margin-bottom:20px;">Home</a>
+    <h2>Transaction History</h2>
+
+    <form method="get">
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+        
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+        
+        <label for="location">Select Location:</label>
+            <select name="location" id="location">
+                <option value="">-- All Locations --</option>
+                {% for location in locations %}
+                    <option value="{{ location.id }}" {% if selected_location_id == location.id %}selected{% endif %}>
+                        {{ location.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        
+        <button type="submit">Filter</button>
+    </form>
+
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Customer</th>
+            <th>Invoice</th>
+            <th>Amount Paid</th>
+            <th>Total</th>
+            <th>Money Got</th>
+            <th>Balance</th>
+            <th>Action</th>
+        </tr>
+        {% for payment in payments %}
+            <tr>
+                <td>{{ payment.date }}</td>
+                <td>{{ payment.invoice.location }}</td>
+                <td>{{ payment.invoice.invoice_number }}</td>
+                <td class="paid">₹{{ payment.amount }}</td>
+                <td>₹{{ payment.invoice.total_amount }}</td>
+                <td>
+                    <span class="money-got {% if payment.invoice.money_got > payment.invoice.total_amount %}money-got-positive{% else %}money-got-neutral{% endif %}">
+                        ₹{{ payment.invoice.money_got }}
+                    </span>
+                </td>
+                <td>
+                    <span class="{% if payment.invoice.balance_amount > 0 %}balance-positive{% else %}balance-zero{% endif %}">
+                        ₹{{ payment.invoice.balance_amount }}
+                    </span>
+                </td>
+                <td>
+                    <form method="POST" action="{% url 'delete_transaction' payment_id=payment.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this entry?');">
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <div class="total-summary">
+        Total Amount Paid: ₹{{ total_amount }}
+    </div>
+
+</body>
+</html>
