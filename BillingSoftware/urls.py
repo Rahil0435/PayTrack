@@ -60,6 +60,7 @@ urlpatterns = [
     path('export-invoices-to-excel/',app.views.export_invoices_to_excel, name='export_invoices_to_excel'),
     path('transaction_report/',app.views.transaction_report, name='transaction_report'),
     path('delete_transaction/<int:payment_id>/',app.views.delete_transaction, name='delete_transaction'),
+    path('delete_customer/<int:customer_id>/',app.views.delete_customer, name='delete_customer'),
     
     path('login2/', app2.views.Login2, name='login2'),
     path('form2/', app2.views.registration2, name='form2'),
@@ -89,9 +90,6 @@ urlpatterns = [
     path('export-invoices-to-excel2/',app2.views.export_invoices_to_excel2, name='export_invoices_to_excel2'),
     path('transaction_report2/',app2.views.transaction_report2, name='transaction_report2'),
     path('delete_transaction2/<int:payment_id>/',app2.views.delete_transaction2, name='delete_transaction2'),
-    # path('undo-money-got/<int:invoice_id>/',app2.views.undo_invoice_money_got, name='undo_invoice_money_got'),
-
-    
 
 
 

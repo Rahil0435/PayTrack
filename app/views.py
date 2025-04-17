@@ -494,46 +494,61 @@ def decimal_to_float(obj):
 
 def edit_invoice(request, invoice_id):
     invoice = get_object_or_404(Invoice, id=invoice_id)
+    locations = Customer.objects.all()  # Fetch locations, not customers
 
     if request.method == "POST":
         try:
+            # Get POST data
             customer = request.POST.get("customer", invoice.customer)
-            date = request.POST.get("date", invoice.date)
-            discount_percentage = request.POST.get("discount_percentage", invoice.discount_percentage)
-            accessory_price = request.POST.get("accessory_price", invoice.accessory_price)
-            e_way = request.POST.get("e_way", invoice.e_way)
+            location_id = request.POST.get("location")
+            date = request.POST.get("date")
+            discount_percentage = request.POST.get("discount_percentage", 0)
+            accessory_price = request.POST.get("accessory_price", 0)
+            e_way = request.POST.get("e_way", 0)
+            sp_discount = request.POST.get("sp_discount", 0)
+            money_got = request.POST.get("money_got", 0)
 
             # Convert to Decimal
-            discount_percentage = Decimal(discount_percentage) if discount_percentage else Decimal(0)
-            accessory_price = Decimal(accessory_price) if accessory_price else Decimal(0)
-            e_way = Decimal(e_way) if e_way else Decimal(0)
+            discount_percentage = Decimal(discount_percentage or 0)
+            accessory_price = Decimal(accessory_price or 0)
+            e_way = Decimal(e_way or 0)
+            sp_discount = Decimal(sp_discount or 0)
+            money_got = Decimal(money_got or 0)
 
+            # Get customer and location objects
+            
+
+            if location_id:
+                location = Customer.objects.get(id=location_id)  # Correct the location fetch
+                invoice.location = location
+
+            # Get product and quantity data
             product_ids = request.POST.getlist("products[]")
             quantities = request.POST.getlist("quantities[]")
 
-            if not product_ids or not quantities:
-                return JsonResponse({"success": False, "message": "Products and quantities are required."})
+            # If no valid products AND all extra fields are zero, return error
+            if (not product_ids or not quantities or len(product_ids) != len(quantities)) and accessory_price == 0 and e_way == 0 and sp_discount == 0:
+                return JsonResponse({"success": False, "message": "Please add at least one product or accessory/e-way/sp discount."})
 
             if len(product_ids) != len(quantities):
                 return JsonResponse({"success": False, "message": "Mismatched product and quantity count."})
 
-            # ✅ Restore stock before deleting old invoice items
+            # Restore stock for existing items in the invoice
             for item in invoice.invoice_items.all():
                 if item.product:
                     item.product.quantity += item.quantity
                     item.product.save()
-
-            # ✅ Clear existing invoice items
             invoice.invoice_items.all().delete()
 
-            # ✅ Process new items
+            # Process new items
             product_total = Decimal(0)
             skipped_items = []
+
             for product_id, quantity in zip(product_ids, quantities):
                 product = Product.objects.filter(id=product_id).first()
 
                 if not product:
-                    skipped_items.append(f"Product ID {product_id} not found")
+                    skipped_items.append(f"Product ID {product_id} not found.")
                     continue
 
                 try:
@@ -550,11 +565,9 @@ def edit_invoice(request, invoice_id):
                 subtotal = price * quantity
                 product_total += subtotal
 
-                # ✅ Deduct the new quantity from stock
                 product.quantity -= quantity
                 product.save()
 
-                # ✅ Create new invoice item
                 InvoiceItem.objects.create(
                     invoice=invoice,
                     product=product,
@@ -563,46 +576,52 @@ def edit_invoice(request, invoice_id):
                     subtotal=subtotal,
                 )
 
-            # ✅ Apply discount only to product total
+            # Apply discount on product total
             discount_amount = (product_total * discount_percentage) / Decimal(100)
             final_product_total = product_total - discount_amount
 
-            # ✅ Update invoice details
-            invoice.customer = customer
+            # Final total calculation
+            total_amount = final_product_total + accessory_price + e_way - sp_discount
+            balance_amount = total_amount - money_got
+
+            # Save invoice
             invoice.date = date
             invoice.discount_percentage = discount_percentage
             invoice.accessory_price = accessory_price
             invoice.e_way = e_way
-
-            # ✅ Final total = discounted product total + accessory + e-way - special discount
-            final_amount = final_product_total + accessory_price + e_way - invoice.sp_discount
-            invoice.total_amount = final_amount
-
+            invoice.sp_discount = sp_discount
+            invoice.money_got = money_got
+            invoice.total_amount = total_amount
+            invoice.balance_amount = balance_amount
             invoice.save()
 
             if skipped_items:
-                skipped_message = f"Invoice updated, but some items were skipped due to issues: {', '.join(skipped_items)}"
+                skipped_message = f"Invoice updated, but some items were skipped: {', '.join(skipped_items)}"
                 return HttpResponse(f"<script>alert('{skipped_message}');window.location='/invoicelist';</script>")
             else:
-                return HttpResponse("<script>alert('Invoice Updated successfully!');window.location='/invoicelist';</script>")
+                return HttpResponse("<script>alert('Invoice updated successfully!');window.location='/invoicelist';</script>")
 
-        except ValueError:
-            return JsonResponse({"success": False, "message": "Invalid number format."})
         except Exception as e:
             return JsonResponse({"success": False, "message": str(e)})
 
-    # ✅ Load data for rendering
+    # GET method – Load edit form
     invoice_items = InvoiceItem.objects.filter(invoice=invoice, product__isnull=False)
     products = Product.objects.exclude(name__icontains='Accessory')
+    customers = Customer.objects.all()
 
+    # Prepare invoice data for the edit form
     invoice_data = {
         "id": invoice.id,
         "customer": str(invoice.customer),
+        "location": str(invoice.location),  # Convert location to string for the form
         "date": invoice.date.strftime("%Y-%m-%d"),
-        "discount": float(invoice.discount_percentage) if invoice.discount_percentage else 0.0,
-        "accessory_price": float(invoice.accessory_price),
-        "e_way": float(invoice.e_way),
-        "total": float(invoice.total_amount) if invoice.total_amount else 0.0,
+        "discount": float(invoice.discount_percentage or 0),
+        "accessory_price": float(invoice.accessory_price or 0),
+        "e_way": float(invoice.e_way or 0),
+        "sp_discount": float(invoice.sp_discount or 0),
+        "money_got": float(invoice.money_got or 0),
+        "total": float(invoice.total_amount or 0),
+        "balance": float(invoice.balance_amount or 0),
         "items": [
             {
                 "product_id": item.product.id,
@@ -613,13 +632,14 @@ def edit_invoice(request, invoice_id):
         ]
     }
 
+    # Render the template
     return render(request, 'Edit invoice.html', {
         'invoice': invoice,
         'invoice_json': json.dumps(invoice_data),
-        'products': products
+        'products': products,
+        'customers': customers,
+        'locations': locations  # Pass locations to the template
     })
-
-
 
 def create_factory_sale(request):
     if request.method == 'POST':
@@ -848,3 +868,9 @@ def delete_transaction(request, payment_id):
 
     # Redirect to the transaction report page
     return redirect(redirect_url)
+
+
+def delete_customer(request, customer_id):
+    customer = get_object_or_404(Customer, id=customer_id)
+    customer.delete()
+    return redirect('viewcustomer')

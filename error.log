@@ -1,606 +1,118 @@
-Internal Server Error: /delete_transaction/14/
+Internal Server Error: /editinvoice/368/
 Traceback (most recent call last):
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
     response = get_response(request)
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
     response = wrapped_callback(request, *callback_args, **callback_kwargs)
-TypeError: delete_transaction() got an unexpected keyword argument 'payment_id'
-"POST /delete_transaction/14/ HTTP/1.1" 500 145
-Internal Server Error: /delete_transaction/14/
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 497, in edit_invoice
+    locations = customer.objects.all()
+                ^^^^^^^^
+UnboundLocalError: cannot access local variable 'customer' where it is not associated with a value
+"POST /editinvoice/368/ HTTP/1.1" 500 145
+Internal Server Error: /delete_customer/1/
 Traceback (most recent call last):
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
     response = get_response(request)
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
     response = wrapped_callback(request, *callback_args, **callback_kwargs)
-TypeError: delete_transaction() got an unexpected keyword argument 'payment_id'
-"POST /delete_transaction/14/ HTTP/1.1" 500 145
-Internal Server Error: /delete_transaction/14/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-TypeError: delete_transaction() got an unexpected keyword argument 'payment_id'
-"POST /delete_transaction/14/ HTTP/1.1" 500 145
-Internal Server Error: /location_report2/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app2\views.py", line 681, in location_report2
-    invoice = Invoice.objects.get(id=invoice_id)
-              ^^^^^^^
-NameError: name 'Invoice' is not defined. Did you mean: 'Invoice2'?
-"POST /location_report2/ HTTP/1.1" 500 145
-Internal Server Error: /location_report2/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app2\views.py", line 686, in location_report2
-    invoice.save()
-    ~~~~~~~~~~~~^^
-  File "C:\New folder\Lickees\BillingSoftware\app2\models.py", line 69, in save
-    self.balance_amount = self.total_amount - self.money_got
-                          ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~
-TypeError: unsupported operand type(s) for -: 'decimal.Decimal' and 'float'
-"POST /location_report2/ HTTP/1.1" 500 145
-Internal Server Error: /transaction_report/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app2\views.py", line 759, in transaction_report
-    return render(request, 'transaction_report.html', {
-        'payments': payments,
-    ...<2 lines>...
-        'end_date': end_date,
-    })
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
-    content = loader.render_to_string(template_name, context, request, using=using)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
-    return template.render(context, request)
-           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
-    return self.template.render(context)
-           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\base.py", line 171, in render
-    return self._render(context)
-           ~~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\base.py", line 163, in _render
-    return self.nodelist.render(context)
-           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\defaulttags.py", line 199, in render
-    len_values = len(values)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 382, in __len__
-    self._fetch_all()
-    ~~~~~~~~~~~~~~~^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1928, in _fetch_all
-    self._result_cache = list(self._iterable_class(self))
-                         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 91, in __iter__
-    results = compiler.execute_sql(
-        chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
-    )
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1561, in execute_sql
-    sql, params = self.as_sql()
-                  ~~~~~~~~~~~^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 747, in as_sql
-    extra_select, order_by, group_by = self.pre_sql_setup(
-                                       ~~~~~~~~~~~~~~~~~~^
-        with_col_aliases=with_col_aliases or bool(combinator),
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 84, in pre_sql_setup
-    self.setup_query(with_col_aliases=with_col_aliases)
-    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 73, in setup_query
-    self.select, self.klass_info, self.annotation_col_map = self.get_select(
-                                                            ~~~~~~~~~~~~~~~^
-        with_col_aliases=with_col_aliases,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 279, in get_select
-    related_klass_infos = self.get_related_selections(select, select_mask)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1248, in get_related_selections
-    next_klass_infos = self.get_related_selections(
-        select,
-    ...<5 lines>...
-        restricted,
-    )
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1213, in get_related_selections
-    raise FieldError(
-    ...<6 lines>...
-    )
-django.core.exceptions.FieldError: Non-relational field given in select_related: 'customer'. Choices are: location
-"GET /transaction_report/ HTTP/1.1" 500 145
-Internal Server Error: /delete_transaction/30/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-TypeError: delete_transaction() got an unexpected keyword argument 'payment_id'
-"POST /delete_transaction/30/ HTTP/1.1" 500 145
-Internal Server Error: /location_report2/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app2\views.py", line 720, in location_report2
-    return render(request, 'location_report.html', context)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
-    content = loader.render_to_string(template_name, context, request, using=using)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
-    return template.render(context, request)
-           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
-    return self.template.render(context)
-           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\base.py", line 171, in render
-    return self._render(context)
-           ~~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\base.py", line 163, in _render
-    return self.nodelist.render(context)
-           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\defaulttags.py", line 327, in render
-    return nodelist.render(context)
-           ~~~~~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
-    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 872, in delete_customer
+    return redirect('customer_list')
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 49, in redirect
+    return redirect_class(resolve_url(to, *args, **kwargs))
+                          ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 180, in resolve_url
+    return reverse(to, args=args, kwargs=kwargs)
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\urls\base.py", line 88, in reverse
     return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
     raise NoReverseMatch(msg)
-django.urls.exceptions.NoReverseMatch: Reverse for 'save_money_got2' not found. 'save_money_got2' is not a valid view function or pattern name.
-"GET /location_report2/ HTTP/1.1" 500 145
-Internal Server Error: /transaction_report/
+django.urls.exceptions.NoReverseMatch: Reverse for 'customer_list' not found. 'customer_list' is not a valid view function or pattern name.
+"GET /delete_customer/1/ HTTP/1.1" 500 145
+Internal Server Error: /editinvoice/368/
 Traceback (most recent call last):
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
     response = get_response(request)
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
     response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app2\views.py", line 818, in transaction_report
-    return render(request, 'transaction_history.html', context)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
-    content = loader.render_to_string(template_name, context, request, using=using)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
-    template = get_template(template_name, using=using)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
-    raise TemplateDoesNotExist(template_name, chain=chain)
-django.template.exceptions.TemplateDoesNotExist: transaction_history.html
-"GET /transaction_report/ HTTP/1.1" 500 145
-Internal Server Error: /transaction_report/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\fields\__init__.py", line 2123, in get_prep_value
-    return int(value)
-ValueError: invalid literal for int() with base 10: 'hyderabad'
-
-The above exception was the direct cause of the following exception:
-
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 634, in edit_invoice
+    'invoice_json': json.dumps(invoice_data),
+                    ~~~~~~~~~~^^^^^^^^^^^^^^
+  File "C:\Users\Nanma-Janaseva\AppData\Local\Programs\Python\Python313\Lib\json\__init__.py", line 231, in dumps
+    return _default_encoder.encode(obj)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\Nanma-Janaseva\AppData\Local\Programs\Python\Python313\Lib\json\encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+  File "C:\Users\Nanma-Janaseva\AppData\Local\Programs\Python\Python313\Lib\json\encoder.py", line 261, in iterencode
+    return _iterencode(o, 0)
+  File "C:\Users\Nanma-Janaseva\AppData\Local\Programs\Python\Python313\Lib\json\encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+                    f'is not JSON serializable')
+TypeError: Object of type Customer is not JSON serializable
+"GET /editinvoice/368/ HTTP/1.1" 500 145
+Internal Server Error: /editinvoice/368/
 Traceback (most recent call last):
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
     response = get_response(request)
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
     response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app2\views.py", line 804, in transaction_report
-    payments = payments.filter(invoice__location__id=selected_location)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1476, in filter
-    return self._filter_or_exclude(False, args, kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1494, in _filter_or_exclude
-    clone._filter_or_exclude_inplace(negate, args, kwargs)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1501, in _filter_or_exclude_inplace
-    self._query.add_q(Q(*args, **kwargs))
-    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1609, in add_q
-    clause, _ = self._add_q(q_object, self.used_aliases)
-                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1641, in _add_q
-    child_clause, needed_inner = self.build_filter(
-                                 ~~~~~~~~~~~~~~~~~^
-        child,
-        ^^^^^^
-    ...<7 lines>...
-        update_join_types=update_join_types,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1555, in build_filter
-    condition = self.build_lookup(lookups, col, value)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1385, in build_lookup
-    lookup = lookup_class(lhs, rhs)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\lookups.py", line 30, in __init__
-    self.rhs = self.get_prep_lookup()
-               ~~~~~~~~~~~~~~~~~~~~^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\lookups.py", line 369, in get_prep_lookup
-    return super().get_prep_lookup()
-           ~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\lookups.py", line 88, in get_prep_lookup
-    return self.lhs.output_field.get_prep_value(self.rhs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\fields\__init__.py", line 2125, in get_prep_value
-    raise e.__class__(
-        "Field '%s' expected a number but got %r." % (self.name, value),
-    ) from e
-ValueError: Field 'id' expected a number but got 'hyderabad'.
-"GET /transaction_report/?start_date=&end_date=&location=hyderabad HTTP/1.1" 500 145
-Internal Server Error: /transaction_report/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\fields\__init__.py", line 2123, in get_prep_value
-    return int(value)
-ValueError: invalid literal for int() with base 10: 'Manglore'
-
-The above exception was the direct cause of the following exception:
-
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 497, in edit_invoice
+    locations = Location.objects.all()  # Fetch locations, not customers
+                ^^^^^^^^
+NameError: name 'Location' is not defined
+"GET /editinvoice/368/ HTTP/1.1" 500 145
+Internal Server Error: /editinvoice/368/
 Traceback (most recent call last):
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
     response = get_response(request)
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
     response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app2\views.py", line 804, in transaction_report
-    payments = payments.filter(invoice__location__id=selected_location)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1476, in filter
-    return self._filter_or_exclude(False, args, kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1494, in _filter_or_exclude
-    clone._filter_or_exclude_inplace(negate, args, kwargs)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1501, in _filter_or_exclude_inplace
-    self._query.add_q(Q(*args, **kwargs))
-    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1609, in add_q
-    clause, _ = self._add_q(q_object, self.used_aliases)
-                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1641, in _add_q
-    child_clause, needed_inner = self.build_filter(
-                                 ~~~~~~~~~~~~~~~~~^
-        child,
-        ^^^^^^
-    ...<7 lines>...
-        update_join_types=update_join_types,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1555, in build_filter
-    condition = self.build_lookup(lookups, col, value)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1385, in build_lookup
-    lookup = lookup_class(lhs, rhs)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\lookups.py", line 30, in __init__
-    self.rhs = self.get_prep_lookup()
-               ~~~~~~~~~~~~~~~~~~~~^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\lookups.py", line 369, in get_prep_lookup
-    return super().get_prep_lookup()
-           ~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\lookups.py", line 88, in get_prep_lookup
-    return self.lhs.output_field.get_prep_value(self.rhs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\fields\__init__.py", line 2125, in get_prep_value
-    raise e.__class__(
-        "Field '%s' expected a number but got %r." % (self.name, value),
-    ) from e
-ValueError: Field 'id' expected a number but got 'Manglore'.
-"GET /transaction_report/?start_date=&end_date=&location=Manglore HTTP/1.1" 500 145
-Internal Server Error: /transaction_report/
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 497, in edit_invoice
+    locations = Location.objects.all()  # Fetch locations, not customers
+                ^^^^^^^^
+NameError: name 'Location' is not defined
+"GET /editinvoice/368/ HTTP/1.1" 500 145
+Internal Server Error: /editinvoice/368/
 Traceback (most recent call last):
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
     response = get_response(request)
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
     response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app2\views.py", line 804, in transaction_report
-    payments = Invoice2.filter(invoice__location__id=selected_location)
-               ^^^^^^^^^^^^^^^
-AttributeError: type object 'Invoice2' has no attribute 'filter'
-"GET /transaction_report/?start_date=&end_date=&location=78 HTTP/1.1" 500 145
-Internal Server Error: /transaction_report/
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 497, in edit_invoice
+    locations = Location.objects.all()  # Fetch locations, not customers
+                ^^^^^^^^
+NameError: name 'Location' is not defined
+"GET /editinvoice/368/ HTTP/1.1" 500 145
+Internal Server Error: /editinvoice/368/
 Traceback (most recent call last):
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
     response = get_response(request)
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
     response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app2\views.py", line 804, in transaction_report
-    payments = Invoice2.objects.all(invoice__location__id=selected_location)
-TypeError: BaseManager.all() got an unexpected keyword argument 'invoice__location__id'
-Internal Server Error: /transaction_report/
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 497, in edit_invoice
+    locations = Customer.objects.all()  # Fetch locations, not customers
+                ^
+NameError: name 'C' is not defined
+"GET /editinvoice/368/ HTTP/1.1" 500 145
+Internal Server Error: /editinvoice/368/
 Traceback (most recent call last):
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
     response = get_response(request)
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
     response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app2\views.py", line 804, in transaction_report
-    payments = Invoice2.objects.all(invoice__location__id=selected_location)
-TypeError: BaseManager.all() got an unexpected keyword argument 'invoice__location__id'
-"GET /transaction_report/?start_date=&end_date=&location=78 HTTP/1.1" 500 145
-Internal Server Error: /transaction_report/
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 497, in edit_invoice
+    locations = Customer.objects.all()  # Fetch locations, not customers
+                ^
+NameError: name 'C' is not defined
+"GET /editinvoice/368/ HTTP/1.1" 500 145
+Internal Server Error: /editinvoice/368/
 Traceback (most recent call last):
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
     response = get_response(request)
   File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
     response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app2\views.py", line 804, in transaction_report
-    payments = Invoice2.objects.all(invoice__location__id=selected_location)
-TypeError: BaseManager.all() got an unexpected keyword argument 'invoice__location__id'
-"GET /transaction_report/?start_date=&end_date=&location=78 HTTP/1.1" 500 145
-Internal Server Error: /transaction_report/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app2\views.py", line 807, in transaction_report
-    total_amount = payments.aggregate(Sum('amount'))['amount__sum'] or 0
-                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 604, in aggregate
-    return self.query.chain().get_aggregation(self.db, kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 459, in get_aggregation
-    aggregate = aggregate_expr.resolve_expression(
-        self, allow_joins=True, reuse=None, summarize=True
-    )
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\aggregates.py", line 63, in resolve_expression
-    c = super().resolve_expression(query, allow_joins, reuse, summarize)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\expressions.py", line 1073, in resolve_expression
-    c.source_expressions[pos] = arg.resolve_expression(
-                                ~~~~~~~~~~~~~~~~~~~~~~^
-        query, allow_joins, reuse, summarize, for_save
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\expressions.py", line 895, in resolve_expression
-    return query.resolve_ref(self.name, allow_joins, reuse, summarize)
-           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 2010, in resolve_ref
-    join_info = self.setup_joins(
-        field_list, self.get_meta(), self.get_initial_alias(), can_reuse=reuse
-    )
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1863, in setup_joins
-    path, final_field, targets, rest = self.names_to_path(
-                                       ~~~~~~~~~~~~~~~~~~^
-        names[:pivot],
-        ^^^^^^^^^^^^^^
-    ...<2 lines>...
-        fail_on_missing=True,
-        ^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1768, in names_to_path
-    raise FieldError(
-    ...<2 lines>...
-    )
-django.core.exceptions.FieldError: Cannot resolve keyword 'amount' into field. Choices are: accessory_price, accessory_quantity, balance_amount, customer, date, discount_percentage, e_way, id, invoice_items, invoice_number, location, location_id, money_got, original_money_got, payments, sp_discount, total_amount
-"GET /transaction_report/?start_date=&end_date=&location=78 HTTP/1.1" 500 145
-Internal Server Error: /transaction_report/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app2\views.py", line 808, in transaction_report
-    locations = locations.filter(invoice__location__id=selected_location)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1476, in filter
-    return self._filter_or_exclude(False, args, kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1494, in _filter_or_exclude
-    clone._filter_or_exclude_inplace(negate, args, kwargs)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1501, in _filter_or_exclude_inplace
-    self._query.add_q(Q(*args, **kwargs))
-    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1609, in add_q
-    clause, _ = self._add_q(q_object, self.used_aliases)
-                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1641, in _add_q
-    child_clause, needed_inner = self.build_filter(
-                                 ~~~~~~~~~~~~~~~~~^
-        child,
-        ^^^^^^
-    ...<7 lines>...
-        update_join_types=update_join_types,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1491, in build_filter
-    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
-                                        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1303, in solve_lookup_type
-    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
-                                ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1768, in names_to_path
-    raise FieldError(
-    ...<2 lines>...
-    )
-django.core.exceptions.FieldError: Cannot resolve keyword 'invoice' into field. Choices are: accessory_price, accessory_quantity, balance_amount, customer, date, discount_percentage, e_way, id, invoice_items, invoice_number, location, location_id, money_got, original_money_got, payments, sp_discount, total_amount
-"GET /transaction_report/?start_date=&end_date=&location=78 HTTP/1.1" 500 145
-Internal Server Error: /addcustomer/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 655, in addcustomer
-    return render(request, 'Add_customer2.html', {'form': form})
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
-    content = loader.render_to_string(template_name, context, request, using=using)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
-    template = get_template(template_name, using=using)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 19, in get_template
-    raise TemplateDoesNotExist(template_name, chain=chain)
-django.template.exceptions.TemplateDoesNotExist: Add_customer2.html
-"GET /addcustomer/ HTTP/1.1" 500 145
-Internal Server Error: /transaction_report/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 797, in transaction_report
-    locations = Customer.objects.filter(invoice2__isnull=False).distinct()
-                ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
-    return getattr(self.get_queryset(), name)(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1476, in filter
-    return self._filter_or_exclude(False, args, kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1494, in _filter_or_exclude
-    clone._filter_or_exclude_inplace(negate, args, kwargs)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1501, in _filter_or_exclude_inplace
-    self._query.add_q(Q(*args, **kwargs))
-    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1609, in add_q
-    clause, _ = self._add_q(q_object, self.used_aliases)
-                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1641, in _add_q
-    child_clause, needed_inner = self.build_filter(
-                                 ~~~~~~~~~~~~~~~~~^
-        child,
-        ^^^^^^
-    ...<7 lines>...
-        update_join_types=update_join_types,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1491, in build_filter
-    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
-                                        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1303, in solve_lookup_type
-    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
-                                ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1768, in names_to_path
-    raise FieldError(
-    ...<2 lines>...
-    )
-django.core.exceptions.FieldError: Cannot resolve keyword 'invoice2' into field. Choices are: id, invoice, name, state
-"GET /transaction_report/ HTTP/1.1" 500 145
-Internal Server Error: /transaction_report/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 797, in transaction_report
-    locations = Customer.objects.filter(invoice2__isnull=False).distinct()
-                ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
-    return getattr(self.get_queryset(), name)(*args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1476, in filter
-    return self._filter_or_exclude(False, args, kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1494, in _filter_or_exclude
-    clone._filter_or_exclude_inplace(negate, args, kwargs)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\query.py", line 1501, in _filter_or_exclude_inplace
-    self._query.add_q(Q(*args, **kwargs))
-    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1609, in add_q
-    clause, _ = self._add_q(q_object, self.used_aliases)
-                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1641, in _add_q
-    child_clause, needed_inner = self.build_filter(
-                                 ~~~~~~~~~~~~~~~~~^
-        child,
-        ^^^^^^
-    ...<7 lines>...
-        update_join_types=update_join_types,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1491, in build_filter
-    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
-                                        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1303, in solve_lookup_type
-    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
-                                ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\db\models\sql\query.py", line 1768, in names_to_path
-    raise FieldError(
-    ...<2 lines>...
-    )
-django.core.exceptions.FieldError: Cannot resolve keyword 'invoice2' into field. Choices are: id, invoice, name, state
-"GET /transaction_report/ HTTP/1.1" 500 145
-Internal Server Error: /location_report/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 667, in location_report
-    today = date.today()
-            ^^^^
-NameError: name 'date' is not defined
-"GET /location_report/ HTTP/1.1" 500 145
-Internal Server Error: /location_report/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 745, in location_report
-    'total_balance': raw_total_balance,
-                     ^^^^^^^^^^^^^^^^^^
-NameError: name 'raw_total_balancetotal_balance' is not defined
-"GET /location_report/?location=&start_date=2025-04-16&end_date=2025-04-16 HTTP/1.1" 500 145
-Internal Server Error: /location_report/
-Traceback (most recent call last):
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
-    response = get_response(request)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
-    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 749, in location_report
-    return render(request, 'location_report2.html', context)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
-    content = loader.render_to_string(template_name, context, request, using=using)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
-    return template.render(context, request)
-           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
-    return self.template.render(context)
-           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\base.py", line 171, in render
-    return self._render(context)
-           ~~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\base.py", line 163, in _render
-    return self.nodelist.render(context)
-           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\base.py", line 1008, in render
-    return SafeString("".join([node.render_annotated(context) for node in self]))
-                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\base.py", line 969, in render_annotated
-    return self.render(context)
-           ~~~~~~~~~~~^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\template\defaulttags.py", line 480, in render
-    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\urls\base.py", line 88, in reverse
-    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\New folder\Lickees\venv\Lib\site-packages\django\urls\resolvers.py", line 831, in _reverse_with_prefix
-    raise NoReverseMatch(msg)
-django.urls.exceptions.NoReverseMatch: Reverse for 'location_wise_report2' not found. 'location_wise_report2' is not a valid view function or pattern name.
-"GET /location_report/?location=&start_date=2025-04-16&end_date=2025-04-16 HTTP/1.1" 500 145
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 497, in edit_invoice
+    locations = Customer.objects.all()  # Fetch locations, not customers
+                ^
+NameError: name 'C' is not defined
+"GET /editinvoice/368/ HTTP/1.1" 500 145

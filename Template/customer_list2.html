@@ -128,7 +128,14 @@
             {% for customer in customers %}
                 <li>
                     <span class="serial">{{ forloop.counter }}.</span>
-                    <span class="details"><strong>{{ customer.name }}</strong> — {{ customer.state }}</span>
+                    <span class="details">
+                        <strong>{{ customer.name }}</strong> — {{ customer.state }}
+                    </span>
+                    <a href="{% url 'delete_customer' customer.id %}"
+                       onclick="return confirm('Are you sure you want to delete {{ customer.name }}?');"
+                       style="color: white; background-color: #dc3545; padding: 6px 12px; border-radius: 6px; margin-left: 10px; text-decoration: none;">
+                        Delete
+                    </a>
                 </li>
             {% endfor %}
         </ul>
