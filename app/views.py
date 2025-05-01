@@ -692,18 +692,23 @@ def location_report(request):
     if not end_date:
         end_date = today.strftime('%Y-%m-%d')
 
-    # Filter invoices
-    invoices = Invoice.objects.all()
+    # Base invoice queryset
+    invoices = Invoice.objects.all().order_by('date','-id')
+
+    # Filter by location if selected
     if location_id:
         invoices = invoices.filter(location__id=location_id)
 
-    # Parse dates and filter invoice date range
+    # Filter by date range
     try:
         parsed_start = datetime.strptime(start_date, "%Y-%m-%d").date()
         parsed_end = datetime.strptime(end_date, "%Y-%m-%d").date()
         invoices = invoices.filter(date__gte=parsed_start, date__lte=parsed_end)
     except ValueError:
         pass  # Optional: handle date parsing errors
+
+    # ✅ Always sort by date DESC, then ID DESC
+    invoices = invoices.order_by('-date', '-id')
 
     # Totals
     total_sales = invoices.aggregate(total=Sum('total_amount'))['total'] or Decimal('0')
@@ -714,7 +719,7 @@ def location_report(request):
         display_total_balance = str(raw_total_balance)
     total_got = invoices.aggregate(total=Sum('money_got'))['total'] or Decimal('0')
 
-    # Handle POST
+    # Handle POST (update money_got)
     if request.method == 'POST':
         count = int(request.POST.get('invoice_count', 0))
         for i in range(1, count + 1):
@@ -741,7 +746,7 @@ def location_report(request):
                     print(f"Error processing invoice {invoice_id}: {e}")
                     continue
 
-        # Redirect to refresh
+        # Redirect to refresh the page with current filters
         return redirect(
             f"{request.path}?location={location_id}&start_date={start_date}&end_date={end_date}"
             if location_id else request.path
@@ -754,7 +759,7 @@ def location_report(request):
         else:
             invoice.display_balance_amount = str(invoice.balance_amount)
 
-    # Render
+    # Render the template
     context = {
         'locations': Customer.objects.all(),
         'selected_location_id': int(location_id) if location_id else '',
