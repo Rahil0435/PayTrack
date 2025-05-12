@@ -154,6 +154,10 @@
         .export-button {
             background-color: #4CAF50;
             color: white;
+            text-decoration: none;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+            margin-left: 450px;
         }
 
         .button-group {
@@ -215,13 +219,9 @@
 
         {% if invoices %}
             <!-- Export to Excel -->
-            <form method="post" action="{% url 'export_invoices_to_excel' %}">
-                {% csrf_token %}
-                <input type="hidden" name="location" value="{{ selected_location_id }}">
-                <div class="button-group">
-                    <button type="submit" class="export-button">Export to Excel</button>
-                </div>
-            </form>
+            <a id="export-button" href="{% url 'export_invoices_to_excel' %}?location={{ selected_location_id }}&start_date={{ selected_start_date }}&end_date={{ selected_end_date }}" class="export-button">
+                Export to Excel</a>
+
 
             <div class="summary-box">
                 <h3>Summary</h3>

@@ -775,14 +775,32 @@ def location_report(request):
 
 import openpyxl
 from openpyxl.utils import get_column_letter
+from django.utils.dateparse import parse_date
 
 def export_invoices_to_excel(request):
     location_id = request.GET.get('location')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
     invoices = Invoice.objects.all()
 
+    # Filter by location
     if location_id:
         invoices = invoices.filter(location__id=location_id)
 
+    # Filter by date range
+    if start_date and end_date:
+        try:
+            parsed_start = parse_date(start_date)
+            parsed_end = parse_date(end_date)
+            if parsed_start and parsed_end:
+                invoices = invoices.filter(date__gte=parsed_start, date__lte=parsed_end)
+        except ValueError:
+            pass  # Invalid date format
+
+    invoices = invoices.order_by('-date', '-id')
+
+    # Create workbook
     workbook = openpyxl.Workbook()
     sheet = workbook.active
     sheet.title = 'Invoices'
@@ -809,10 +827,13 @@ def export_invoices_to_excel(request):
         length = max(len(str(cell.value)) for cell in column_cells)
         sheet.column_dimensions[get_column_letter(column_cells[0].column)].width = length + 3
 
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
     response['Content-Disposition'] = 'attachment; filename=location_wise_invoices.xlsx'
     workbook.save(response)
     return response
+
 
 from django.utils import timezone
 
