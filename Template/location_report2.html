@@ -13,7 +13,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1080px;
             margin: auto;
             background: #fff;
             padding: 25px 30px;
@@ -96,6 +96,7 @@
             border-radius: 10px;
             background-color: #f9f9f9;
             border: 1px solid #ddd;
+            
         }
 
         .summary-box h3 {
@@ -240,6 +241,10 @@
                     <span style="color: {% if total_got >= total_sales %}green{% else %}red{% endif %}; font-weight: bold;">
                         ₹ {{ total_got }}
                     </span>
+                </div>
+                <div class="row">
+                    <label>Total Advance Amount:</label>
+                    <span style="color: green; font-weight: bold;">₹ {{ total_advance }}</span>
                 </div>
                 <div class="row">
                     <a href="{% url 'transaction_report' %}" class="btn">View Transaction History</a>

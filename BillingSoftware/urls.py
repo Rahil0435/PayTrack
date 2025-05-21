@@ -55,12 +55,14 @@ urlpatterns = [
     path('factorysalelist/',app.views.factory_sale_list, name='factorysalelist'),
     path('factorysale/delete/<int:sale_id>/',app.views.delete_factory_sale, name='delete_factory_sale'),
     path('addcustomer/',app.views.addcustomer,name='addcustomer'),
-    path('viewcustomer/', app.views.customer2_list,name='viewcustomer'),
+    path('viewcustomer/', app.views.customer_list,name='viewcustomer'),
     path('location_report/',app.views.location_report, name='locationreport'),
     path('export-invoices-to-excel/',app.views.export_invoices_to_excel, name='export_invoices_to_excel'),
     path('transaction_report/',app.views.transaction_report, name='transaction_report'),
     path('delete_transaction/<int:payment_id>/',app.views.delete_transaction, name='delete_transaction'),
     path('delete_customer/<int:customer_id>/',app.views.delete_customer, name='delete_customer'),
+    path('update_advance/<int:customer_id>/',app.views.update_advance_amount, name='update_advance'),
+    path('advance-usage-report/', app.views.advance_usage_report, name='advance_usage_report'),
     
     path('login2/', app2.views.Login2, name='login2'),
     path('form2/', app2.views.registration2, name='form2'),
@@ -90,6 +92,11 @@ urlpatterns = [
     path('export-invoices-to-excel2/',app2.views.export_invoices_to_excel2, name='export_invoices_to_excel2'),
     path('transaction_report2/',app2.views.transaction_report2, name='transaction_report2'),
     path('delete_transaction2/<int:payment_id>/',app2.views.delete_transaction2, name='delete_transaction2'),
+    path('delete_customer2/<int:customer_id>/',app2.views.delete_customer2, name='delete_customer2'),
+    path('update_advance2/<int:customer_id>/',app2.views.update_advance_amount2, name='update_advance2'),
+    path('advance-usage-report2/', app2.views.advance_usage_report2, name='advance_usage_report2'),
+
+
 
 
 

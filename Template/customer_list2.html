@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,7 +48,7 @@
             padding: 30px 40px;
             border-radius: 12px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
+            max-width: 700px;
             margin: auto;
         }
 
@@ -94,6 +95,7 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
 
         li:hover {
@@ -111,9 +113,67 @@
 
         .details {
             flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .advance {
+            font-size: 14px;
+            color: #555;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .form-inline {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .form-inline input[type="number"] {
+            width: 80px;
+            padding: 4px 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-inline button {
+            padding: 4px 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .form-inline button:hover {
+            background-color: #218838;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        .total-advance {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 16px;
+            text-align: right;
+            color: #333;
         }
     </style>
 </head>
+
 <body>
     <div class="home-btn">
         <button><a href="{% url 'userhome' %}">Home</a></button>
@@ -126,19 +186,27 @@
         </div>
         <ul>
             {% for customer in customers %}
-                <li>
-                    <span class="serial">{{ forloop.counter }}.</span>
-                    <span class="details">
-                        <strong>{{ customer.name }}</strong> — {{ customer.state }}
-                    </span>
-                    <a href="{% url 'delete_customer' customer.id %}"
-                       onclick="return confirm('Are you sure you want to delete {{ customer.name }}?');"
-                       style="color: white; background-color: #dc3545; padding: 6px 12px; border-radius: 6px; margin-left: 10px; text-decoration: none;">
-                        Delete
-                    </a>
-                </li>
+            <li>
+                <span class="serial">{{ forloop.counter }}.</span>
+                <div class="details">
+                    <strong>{{ customer.name }}</strong> — {{ customer.state }}
+                    <form method="post" action="{% url 'update_advance' customer.id %}" class="form-inline">
+                        {% csrf_token %}
+                        <label>Advance: ₹</label>
+                        <input type="number" name="advance_amount" value="{{ customer.advance_amount }}">
+                        <button type="submit">Update</button>
+                    </form>
+                </div>
+                <a href="{% url 'delete_customer' customer.id %}"
+                    onclick="return confirm('Are you sure you want to delete {{ customer.name }}?');"
+                    class="delete-btn">
+                    Delete
+                </a>
+            </li>
             {% endfor %}
+            <div class="total-advance">Total Advance: ₹{{ total_advance }}</div>
         </ul>
     </div>
 </body>
+
 </html>

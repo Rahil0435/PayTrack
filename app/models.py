@@ -32,6 +32,7 @@ class ProductionHistory(models.Model):
 class Customer(models.Model):
     name = models.CharField(max_length=100)
     state = models.CharField(max_length=100,blank=True)
+    advance_amount = models.IntegerField(default=0, help_text="Advance amount paid by the customer")
 
     def __str__(self):
         return self.name
@@ -49,7 +50,7 @@ class Invoice(models.Model):
     sp_discount =models.IntegerField(default=0)
     money_got = models.IntegerField(default=0)
     balance_amount = models.IntegerField(default=0)
-    original_money_got = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    advance_used = models.IntegerField(default=0)
 
     def final_amount(self):
         discount_amount = (self.total_amount - self.accessory_price) * (self.discount_percentage / 100)

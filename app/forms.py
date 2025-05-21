@@ -73,7 +73,7 @@ class FactorySaleForm(forms.ModelForm):
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
-        fields = ['name', 'state']
+        fields = ['name', 'state','advance_amount']
 
 class MoneyUpdateForm2(forms.ModelForm):
     class Meta:

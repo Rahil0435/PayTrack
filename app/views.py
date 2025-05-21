@@ -105,45 +105,40 @@ def get_stock(request, product_id=None):
         return JsonResponse({'error': 'Product not found'}, status=404)
 
 
-def createinvoice(request):  
+def createinvoice(request):
     invoice_form = InvoiceForm(request.POST or None)
 
     if request.method == 'POST':
         if invoice_form.is_valid():
             try:
                 with transaction.atomic():
-                    # Generate invoice number BEFORE saving
+                    # Generate invoice number
                     last_invoice = Invoice.objects.order_by('-id').first()
                     if last_invoice and last_invoice.invoice_number:
                         match = re.search(r'INV2-(\d+)', last_invoice.invoice_number)
-                        if match:
-                            last_number = int(match.group(1))
-                            new_number = last_number + 1
-                        else:
-                            new_number = 1
+                        new_number = int(match.group(1)) + 1 if match else 1
                     else:
                         new_number = 1
                     generated_invoice_number = f"INV2-{new_number:05d}"
 
-                    # Save form without committing, assign invoice number
+                    # Save form data
                     invoice = invoice_form.save(commit=False)
                     invoice.invoice_number = generated_invoice_number
+                    invoice.customer = request.POST.get("customer")
 
-                    # Set manually entered customer name (not FK)
-                    customer_name = request.POST.get("customer")
-                    invoice.customer = customer_name
-
-                    # Handle ForeignKey for location
-                    location = request.POST.get("location")
-                    if location:
+                    location_id = request.POST.get("location")
+                    customer_obj = None
+                    if location_id:
                         try:
-                            invoice.location = Customer.objects.get(id=location)
+                            customer_obj = Customer.objects.get(id=location_id)
+                            invoice.location = customer_obj
                         except Customer.DoesNotExist:
                             messages.error(request, "Selected location is invalid.")
                             return redirect('createinvoice')
 
                     invoice.save()
 
+                    # Get form product and accessory inputs
                     products = request.POST.getlist('products[]')
                     quantities = request.POST.getlist('quantities[]')
                     accessory_quantities = request.POST.getlist('accessory_quantity')
@@ -151,6 +146,7 @@ def createinvoice(request):
                     e_way = request.POST.get('e_way', "0")
                     sp_discount = request.POST.get("sp_discount", "0")
 
+                    # Parse decimal inputs
                     try:
                         e_way = Decimal(str(e_way).strip()) if e_way.strip() else Decimal(0)
                     except ValueError:
@@ -174,6 +170,7 @@ def createinvoice(request):
                     accessory_total = Decimal(0)
                     valid_items = 0
 
+                    # Handle products
                     for i in range(len(products)):
                         try:
                             product_id = products[i].strip()
@@ -181,7 +178,6 @@ def createinvoice(request):
 
                             if product_id and quantity > 0:
                                 product = get_object_or_404(Product, id=product_id)
-
                                 if product.quantity >= quantity:
                                     price = Decimal(str(product.price))
                                     subtotal = price * quantity
@@ -199,12 +195,12 @@ def createinvoice(request):
                                     valid_items += 1
                                 else:
                                     messages.warning(request, f"Not enough stock for {product.name}. Skipped.")
-
                         except (ValueError, Product.DoesNotExist) as e:
                             messages.error(request, f"Invalid product selection: {e}")
                             invoice.delete()
                             return redirect('createinvoice')
 
+                    # Handle accessories
                     for j in range(len(accessory_prices)):
                         try:
                             accessory_price = Decimal(str(accessory_prices[j]).strip()) if accessory_prices[j].strip() else Decimal(0)
@@ -222,7 +218,6 @@ def createinvoice(request):
                                     subtotal=subtotal
                                 )
                                 valid_items += 1
-
                         except ValueError as e:
                             messages.error(request, f"Invalid accessory price or quantity entered: {e}")
                             invoice.delete()
@@ -233,14 +228,33 @@ def createinvoice(request):
                         messages.error(request, "No valid items to create an invoice.")
                         return redirect('createinvoice')
 
+                    # Apply product discount
                     discount_percentage = Decimal(str(invoice.discount_percentage or 0))
                     discount_amount = (product_total * discount_percentage) / Decimal(100)
                     final_product_total = product_total - discount_amount
 
-                    final_amount = final_product_total + accessory_total + e_way - sp_discount
+                    # Calculate full total
+                    total_invoice_amount = final_product_total + accessory_total + e_way - sp_discount
 
-                    invoice.total_amount = final_amount
+                    # Set original total (DO NOT reduce by advance)
+                    invoice.total_amount = total_invoice_amount
+
+                    # Deduct advance from money_got only
+                    advance_used = Decimal(0)
+                    if customer_obj and customer_obj.advance_amount > 0:
+                        advance_available = customer_obj.advance_amount
+                        if advance_available >= total_invoice_amount:
+                            advance_used = total_invoice_amount
+                            customer_obj.advance_amount -= total_invoice_amount
+                        else:
+                            advance_used = advance_available
+                            customer_obj.advance_amount = Decimal('0.00')
+                        customer_obj.save()
+
+                    invoice.money_got = advance_used
+                    invoice.balance_amount = total_invoice_amount - advance_used
                     invoice.e_way = e_way
+                    invoice.advance_used = advance_used
                     invoice.save()
 
                     messages.success(request, f"Invoice {invoice.invoice_number} created successfully!")
@@ -252,12 +266,13 @@ def createinvoice(request):
                 messages.error(request, f"An unexpected error occurred: {e}")
 
     products = Product.objects.all().order_by('price')
-    location = Customer.objects.all()  
+    location = Customer.objects.all()
     return render(request, 'create invoice.html', {
         'invoice_form': invoice_form,
         'products': products,
-        'locations': location, 
+        'locations': location,
     })
+
 
 def invoice_list(request):
     invoices = Invoice.objects.all().order_by('-date','-id')  # Order by date (newest first)
@@ -676,9 +691,14 @@ def addcustomer(request):
         form = CustomerForm()
     return render(request, 'Add_customer2.html', {'form': form})
 
-def customer2_list(request):
-    customers = Customer.objects.all()
-    return render(request, 'customer_list2.html',{'customers': customers})
+def customer_list(request):
+    customers = Customer.objects.all().order_by('name')  # Optional sorting
+    total_advance = customers.aggregate(total=Sum('advance_amount'))['total'] or Decimal('0.00')
+
+    return render(request, 'customer_list2.html', {
+        'customers': customers,
+        'total_advance': total_advance,
+    })
 
 def location_report(request):
     location_id = request.GET.get('location')
@@ -693,7 +713,7 @@ def location_report(request):
         end_date = today.strftime('%Y-%m-%d')
 
     # Base invoice queryset
-    invoices = Invoice.objects.all().order_by('date','-id')
+    invoices = Invoice.objects.all().order_by('date', '-id')
 
     # Filter by location if selected
     if location_id:
@@ -707,10 +727,10 @@ def location_report(request):
     except ValueError:
         pass  # Optional: handle date parsing errors
 
-    # ✅ Always sort by date DESC, then ID DESC
+    # Sort by date DESC, then ID DESC
     invoices = invoices.order_by('-date', '-id')
 
-    # Totals
+    # Calculate totals
     total_sales = invoices.aggregate(total=Sum('total_amount'))['total'] or Decimal('0')
     raw_total_balance = invoices.aggregate(total=Sum('balance_amount'))['total'] or Decimal('0')
     if raw_total_balance < 0:
@@ -719,6 +739,12 @@ def location_report(request):
         display_total_balance = str(raw_total_balance)
     total_got = invoices.aggregate(total=Sum('money_got'))['total'] or Decimal('0')
 
+    # Calculate total advance amount for customers in selected location
+    customers = Customer.objects.all()
+    if location_id:
+        customers = customers.filter(id=location_id)
+
+    total_advance = customers.aggregate(total=Sum('advance_amount'))['total'] or 0
     # Handle POST (update money_got)
     if request.method == 'POST':
         count = int(request.POST.get('invoice_count', 0))
@@ -759,7 +785,7 @@ def location_report(request):
         else:
             invoice.display_balance_amount = str(invoice.balance_amount)
 
-    # Render the template
+    # Render the template with total advance included
     context = {
         'locations': Customer.objects.all(),
         'selected_location_id': int(location_id) if location_id else '',
@@ -770,6 +796,7 @@ def location_report(request):
         'total_balance': raw_total_balance,
         'display_total_balance': display_total_balance,
         'total_got': total_got,
+        'total_advance': total_advance,  # Pass total advance here
     }
     return render(request, 'location_report2.html', context)
 
@@ -900,3 +927,23 @@ def delete_customer(request, customer_id):
     customer = get_object_or_404(Customer, id=customer_id)
     customer.delete()
     return redirect('viewcustomer')
+
+def update_advance_amount(request, customer_id):
+    if request.method == 'POST':
+        customer = get_object_or_404(Customer, id=customer_id)
+        try:
+            customer.advance_amount = int(request.POST.get('advance_amount') or 0)
+            customer.save()
+        except ValueError:
+            pass  # Handle invalid input gracefully
+    return redirect('viewcustomer') 
+
+def advance_usage_report(request):
+    invoices_with_advance = Invoice.objects.filter(advance_used__gt=0)
+
+    total_advance_used = invoices_with_advance.aggregate(total=Sum('advance_used'))['total'] or 0
+
+    return render(request, 'advance_usage_report.html', {
+        'invoices': invoices_with_advance,
+        'total_advance_used': total_advance_used,
+    })

@@ -13,7 +13,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1080px;
             margin: auto;
             background: #fff;
             padding: 25px 30px;
@@ -90,13 +90,13 @@
         tr:hover {
             background-color: #f1f1f1;
         }
-
         .summary-box {
             margin-top: 30px;
             padding: 20px;
             border-radius: 10px;
             background-color: #f9f9f9;
             border: 1px solid #ddd;
+            
         }
 
         .summary-box h3 {
@@ -109,11 +109,11 @@
         }
 
         .summary-box .row {
-            display: flex;
-            gap: 20px;
+            display: inline;
             align-items: center;
             flex-wrap: wrap;
             margin-bottom: 10px;
+            margin-left: 35px;
         }
 
         .summary-box .row label {
@@ -155,6 +155,10 @@
         .export-button {
             background-color: #4CAF50;
             color: white;
+            text-decoration: none;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+            margin-left: 450px;
         }
 
         .button-group {
@@ -216,13 +220,40 @@
 
         {% if invoices %}
             <!-- Export to Excel -->
-            <form method="post" action="{% url 'export_invoices_to_excel2' %}">
-                {% csrf_token %}
-                <input type="hidden" name="location" value="{{ selected_location_id }}">
-                <div class="button-group">
-                    <button type="submit" class="export-button">Export to Excel</button>
+            <a id="export-button" href="{% url 'export_invoices_to_excel' %}?location={{ selected_location_id }}&start_date={{ selected_start_date }}&end_date={{ selected_end_date }}" class="export-button">
+                Export to Excel</a>
+
+
+            <div class="summary-box">
+                <h3>Summary</h3>
+                <div class="row">
+                    <label>Total Sales Amount:</label>
+                    <span>₹ {{ total_sales }}</span>
                 </div>
-            </form>
+                <div class="row">
+                    <label>Total Balance Amount:</label>
+                    <span style="color: {% if total_balance < 0 %}green{% else %}black{% endif %};">
+                        {{ display_total_balance }}
+                    </span>
+                </div>
+                <div class="row">
+                    <label>Total Amount Got:</label>
+                    <span style="color: {% if total_got >= total_sales %}green{% else %}red{% endif %}; font-weight: bold;">
+                        ₹ {{ total_got }}
+                    </span>
+                </div>
+                <div class="row">
+                    <label>Total Advance Amount:</label>
+                    <span style="color: green; font-weight: bold;">₹ {{ total_advance }}</span>
+                </div>
+                <div class="row">
+                    <a href="{% url 'transaction_report2' %}" class="btn">View Transaction History</a>
+                </div>
+            </div>
+        {% else %}
+            <p class="no-data">No invoices found for the selected location and date range.</p>
+        {% endif %}
+    </div>
 
             <!-- Invoice Table -->
             <form method="post">
@@ -259,8 +290,8 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span id="balance_{{ forloop.counter }}">
-                                        ₹{{ invoice.balance_amount }}
+                                    <span style="color: {% if invoice.balance_amount < 0 %}green{% else %}black{% endif %};">
+                                        {{ invoice.display_balance_amount }}
                                     </span>
                                 </td>
                                 <input type="hidden" name="invoice_id_{{ forloop.counter }}" value="{{ invoice.id }}">
@@ -276,30 +307,7 @@
             </form>
 
             <!-- Summary -->
-            <div class="summary-box">
-                <h3>Summary</h3>
-                <div class="row">
-                    <label>Total Sales Amount:</label>
-                    <span>₹ {{ total_sales }}</span>
-                </div>
-                <div class="row">
-                    <label>Total Balance Amount:</label>
-                    <span>₹ {{ total_balance }}</span>
-                </div>
-                <div class="row">
-                    <label>Total Amount Got:</label>
-                    <span style="color: {% if total_got >= total_sales %}green{% else %}red{% endif %}; font-weight: bold;">
-                        ₹ {{ total_got }}
-                    </span>
-                </div>
-                <div class="row">
-                    <a href="{% url 'transaction_report2' %}" class="btn">View Transaction History</a>
-                </div>
-            </div>
-        {% else %}
-            <p class="no-data">No invoices found for the selected location and date range.</p>
-        {% endif %}
-    </div>
+        
 
     <script>
         document.querySelectorAll('input[name^="money_got_"]').forEach(input => {

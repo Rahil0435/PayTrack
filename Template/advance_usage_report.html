@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advance Usage Report</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px;
+            background-color: #f4f6f8;
+        }
+
+        h2 {
+            text-align: center;
+            color: #007BFF;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #eef4ff;
+        }
+
+        h4 {
+            margin-top: 20px;
+            text-align: right;
+            color: #333;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Advance Usage Report</h2>
+
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Invoice No</th>
+            <th>Customer</th>
+            <th>Location</th>
+            <th>Advance Used</th>
+        </tr>
+        {% for invoice in invoices %}
+        <tr>
+            <td>{{ invoice.date }}</td>
+            <td>{{ invoice.invoice_number }}</td>
+            <td>{{ invoice.customer }}</td>
+            <td>{{ invoice.location.name }}</td>
+            <td>₹{{ invoice.advance_used }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h4>Total Advance Used: ₹{{ total_advance_used }}</h4>
+
+</body>
+</html>
