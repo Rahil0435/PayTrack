@@ -682,3 +682,14 @@ Traceback (most recent call last):
     raise TemplateDoesNotExist(template_name, chain=chain)
 django.template.exceptions.TemplateDoesNotExist: advance_usage_report.html
 "GET /advance-usage-report2/ HTTP/1.1" 500 145
+Internal Server Error: /location_report/
+Traceback (most recent call last):
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\New folder\Lickees\venv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\New folder\Lickees\BillingSoftware\app\views.py", line 759, in location_report
+    if invoice.original_money_got is None:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Invoice' object has no attribute 'original_money_got'
+"POST /location_report/ HTTP/1.1" 500 145

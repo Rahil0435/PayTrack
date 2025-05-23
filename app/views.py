@@ -756,8 +756,8 @@ def location_report(request):
                     invoice = Invoice.objects.get(id=invoice_id)
                     added_amount = Decimal(money_got or '0')
                     if added_amount > 0:
-                        if invoice.original_money_got is None:
-                            invoice.original_money_got = invoice.money_got
+                        if invoice.advance_used is None:
+                            invoice.advance_used = invoice.money_got
                         invoice.money_got += added_amount
                         invoice.balance_amount = invoice.total_amount - invoice.money_got
                         invoice.save()
