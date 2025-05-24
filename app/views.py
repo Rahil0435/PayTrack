@@ -753,7 +753,7 @@ def location_report(request):
             money_got = request.POST.get(f'money_got_{i}')
             if invoice_id:
                 try:
-                    invoice = Invoice.objects.get(id=invoice_id)
+                    invoice = Invoice.objects.get(id=invoice_id)   
                     added_amount = Decimal(money_got or '0')
                     if added_amount > 0:
                         if invoice.advance_used is None:
